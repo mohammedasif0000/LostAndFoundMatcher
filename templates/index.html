@@ -28,20 +28,100 @@
 
     </header>
     <main>
+
         <section>
             <div class="choice-container">
 
-                <a href="#" class="choice-card lost-card">
+                <a href="{{ url_for('report_lost') }}" class="choice-card lost-card">
                     <h2>LOST</h2>
                 </a>
 
-                <a href="#" class="choice-card found-card">
+                <a href="{{ url_for('report_found') }}" class="choice-card found-card">
                     <h2>FOUND</h2>
                 </a>
 
             </div>
         </section>
+
+        <section class="how-it-works">
+            <div class="section-heading">
+                <h2>HOW IT WORKS</h2>
+                <p>Find your lost item in four simple steps.</p>
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <span class="step-number">01</span>
+                    <h3>Report an Item</h3>
+                    <p>Tell us about the item you lost or found.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">02</span>
+                    <h3>Smart Matching</h3>
+                    <p>Our system looks for possible matches.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">03</span>
+                    <h3>Verify Ownership</h3>
+                    <p>Confirm that the item belongs to you.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">04</span>
+                    <h3>Get It Back</h3>
+                    <p>Reconnect with your lost item.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="live-stats">
+            <div class="section-heading">
+                <h2>LIVE STATISTICS</h2>
+                <p>Our community is helping lost items find their way home.</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number">0</span>
+                    <h3>Items Reported</h3>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">0</span>
+                    <h3>Items Found</h3>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">0</span>
+                    <h3>Items Returned</h3>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">0</span>
+                    <h3>Success Rate</h3>
+                </div>
+            </div>
+        </section>
+
     </main>
 </body>
+
+<footer class="site-footer">
+    <div class="footer-content">
+
+        <div class="footer-brand">
+            <h2>LOST AND FOUND</h2>
+            <p>Find. Report. Reunite.</p>
+        </div>
+
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Team</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <P>© 2026 LOST AND FOUND. All rights reserved.</P>
+    </div>
+</footer>
 
 </html>
