@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Lost & Found Matcher</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+    <title>Lost & Found</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>    
+
 <body>
-    <h1>
-        Flask Connected Successfully!</h1>
+    <header>
+
+        <div class="logo">
+            LOGO
+        </div>
+        <h1>Lost & Found</h1>
+        <p class="tagline">
+            Find. Report. Reunite.
+        </p>
+        <h2 class="question">
+            What brings you here today?
+        </h2>
+
+    </header>
+    <main>
+        <section>
+            <div class="choice-container">
+
+                <a href="#" class="choice-card lost-card">
+                    <h2>LOST</h2>
+                </a>
+
+                <a href="#" class="choice-card found-card">
+                    <h2>FOUND</h2>
+                </a>
+
+            </div>
+        </section>
+    </main>
 </body>
+
 </html>

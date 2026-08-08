@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REPORT FOUND</title>
+</head>
+
+<body>
+
+    <h1>Report Found</h1>
+
+    <h2>Fill the following details</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <ol>
+
+            <!-- Item Name -->
+            <li>
+                <b>Item name:</b>
+                <input
+                    type="text"
+                    name="item_name"
+                    placeholder="Type here"
+                    required>
+
+                <ul>
+                    <li>The item you have lost</li>
+                </ul>
+            </li>
+
+            <br>
+
+            <!-- Category -->
+            <li>
+                <b>Category:</b>
+                <select name="category" required>
+                    <option value="">Select category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="documents">Documents</option>
+                    <option value="wallet">Wallet / Money</option>
+                    <option value="keys">Keys</option>
+                    <option value="bags">Bags</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <ul>
+                    <li>The category of the item you found</li>
+                </ul>
+            </li>
+
+            <br>
+
+            <!-- Date Found -->
+            <li>
+                <b>Date found:</b>
+                <input
+                    type="date"
+                    name="date"
+                    required>
+            </li>
+
+            <br>
+
+            <!-- Location Found -->
+            <li>
+                <b>Location found:</b>
+                <input
+                    type="text"
+                    name="location"
+                    placeholder="Enter location"
+                    required>
+
+                <ul>
+                    <li>Where did you find this item?</li>
+                </ul>
+            </li>
+
+            <br>
+
+            <!-- Description -->
+            <li>
+                <b>Description:</b>
+                <br><br>
+
+                <textarea
+                    name="description"
+                    rows="5"
+                    cols="40"
+                    placeholder="Describe the item..."
+                    required></textarea>
+
+                <ul>
+                    <li>Tell us briefly about your item</li>
+                </ul>
+            </li>
+
+            <br>
+
+            <!-- Image -->
+            <li>
+                <b>Upload image:</b>
+                <input
+                    type="file"
+                    name="photos"
+                    accept="image/*"
+                    multiple
+                    required>
+
+                <ul>
+                    <li>Mandatory</li>
+                </ul>
+            </li>
+
+            <br>
+
+            <!-- Contact Number -->
+            <li>
+                <b>Contact number:</b>
+                <input
+                    type="tel"
+                    name="contact"
+                    maxlength="10"
+                    minlength="10"
+                    placeholder="Enter your number"
+                    required>
+            </li>
+
+        </ol>
+
+        <br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+</body>
+
+</html>
