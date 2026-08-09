@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+    <title>MATCH RESULT</title>
+</head>
+
+<body>
+    <main class="match-page">
+
+        <section class="match-header">
+            <h1>Possible Match Found</h1>
+            <p>We found an item that may match your lost item.</p>
+        </section>
+
+        <section class="match-comparision">
+            <div class="item-card">
+                <h2>Your Lost Item</h2>
+
+                <div class="item-image">
+                    <img src="{{ url_for('static', filename=lost_image) }}"
+                        alt="Your lost item">
+                </div>
+                <div class="item-details">
+                    <p>
+                        <strong>Item:</strong>
+                        {{lost_item}}
+                    </p>
+                    <p>
+                        <strong>Category:</strong>
+                        {{lost_category}}
+                    </p>
+                    <p>
+                        <strong>Location:</strong>
+                        {{lost_location}}
+                    </p>
+                    <p>
+                        <strong>Date:</strong>
+                        {{lost_date}}
+                    </p>
+                </div>
+            </div>
+
+            <!--MATCH SCORE-->
+            <div class="match-score">
+                <span>{{ match_score }}%</span>
+                <p>Match</p>
+            </div>
+
+            <!--POSSIBLE FOUND ITEM-->
+            <div class="item-card">
+                <h2>Possible Found Item</h2>
+
+                <div class="item-image">
+                    <img src="{{ url_for('static', filename=found_image) }}"
+                        alt="Possible found item">
+                </div>
+
+                <div class="item-details">
+                    <p>
+                        <strong>Item:</strong>
+                        {{found_item}}
+                    </p>
+                    <p>
+                        <strong>Category:</strong>
+                        {{found_category}}
+                    </p>
+                    <p>
+                        <strong>Location:</strong>
+                        {{found_location}}
+                    </p>
+                    <p>
+                        <strong>Date:</strong>
+                        {{found_date}}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!--WHY THIS IS A MATCH-->
+        <section class="match-reasons">
+            <h2>Why We Think It Matches</h2>
+            <ul>
+                <li>Same category</li>
+                <li>Similar description</li>
+                <li>Nearby location</li>
+            </ul>
+        </section>
+
+        <!--USER DECISION-->
+        <section class="match-actions">
+            <h2>Is this your item?</h2>
+            <a href="{{ url_for('verification') }}">
+                This Is My Item
+            </a>
+            <a href="{{ url_for('search') }}">
+                Not My Item
+            </a>
+        </section>
+
+    </main>
+</body>
+
+</html>
