@@ -1,4 +1,5 @@
 from flask import Flask,render_template,request
+from database.db import add_item
 
 app = Flask(__name__)
 
@@ -15,12 +16,18 @@ def report_lost():
         location = request.form.get("location")
         description = request.form.get("description")
         contact = request.form.get("contact")
-        print("ITEM:",item_name)
-        print("CATEGORY:",category)
-        print("DATE:",date)
-        print("LOCATION:",location)
-        print("DESCRIPTION:",description)
-        print("CONTACT:",contact)
+
+        add_item(
+                         "lost",
+                         item_name,
+                         category,
+                         description,
+                         location,
+                         date,
+                         None,
+                         contact
+                    )
+    print("LOST ITEM SAVED TO DATABASE")
     return render_template("report_lost.html")
 
 @app.route("/report_found", methods=["GET", "POST"])
@@ -32,6 +39,7 @@ def report_found():
             location = request.form.get("location")
             description = request.form.get("description")
             contact = request.form.get("contact")
+
             print("ITEM:",item_name)
             print("CATEGORY:",category)
             print("DATE:",date)
@@ -39,7 +47,7 @@ def report_found():
             print("DESCRIPTION:",description)
             print("CONTACT:",contact)
     return render_template("report_found.html")
-
+            
 @app.route("/match_result")
 def match_result():
      match_score = 92
