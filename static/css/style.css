@@ -80,3 +80,182 @@ header h1{
 .choice-card:hover{
     transform: scale(1.5);
 }
+
+
+/*css report lost*/
+body{
+
+     font-family: 'Inter' ,sans-serif;
+}
+h1{
+    text-align: center;
+    color: white;
+}
+
+h2 {
+    text-align: center;
+}
+form{
+    width:80%;
+    margin:auto;
+    padding: 30px;
+    border-radius : 20px;
+}
+input,
+select,
+textarea{
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #555;
+    border-radius: 10px;
+    background-color: #232522;
+    color: #FFFAFB;
+
+}
+
+input::placeholder,
+textarea::placeholder{
+    color: #aaa; 
+}
+
+form b{
+    font-size: 18px;
+    font-weight:700;
+}
+
+textarea{
+    resize: vertical;
+
+}
+
+form button{
+    padding: 12px 30px;
+    background-color:#FFFAFB;
+    color: #131515;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color :#555;
+    color : white ;
+}
+
+form li{
+    margin-bottom:25px;
+}
+
+form ul {
+    margin-top: 8px;
+}
+
+form ul li {
+    font-size: 14px;
+    color: #aaa;
+}
+/*for small screen like mobile*/
+@media(max-width: 600px){
+    form{
+        width:90%;
+        padding:20px;
+
+    }
+
+}
+
+input,
+select,
+textarea{
+    box-sizing: border-box;
+
+}
+
+form{
+    line-height: 1.5;
+}
+
+input,
+select,
+textarea,
+button{
+    font-family: "Inter",sans-serif;
+}
+
+form > ol {
+    padding-left: 25px;
+}
+
+input[type="file"] {
+    padding: 10px;
+}
+
+form button {
+    margin-top: 15px;
+}
+form button {
+    padding: 12px 30px;
+    background-color: #FFFAFB;
+    color: #131515;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 15px;
+}
+
+form button {
+    display: block;
+    margin: 15px auto 0;
+}
+
+/* Button hover effect */
+form button:hover {
+    background-color: #555;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Input focus effect */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #FFFAFB;
+}
+
+/* Form shadow */
+form {
+    background-color: #1f211f;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* Mobile screen */
+@media (max-width: 600px) {
+
+    body {
+        padding: 20px;
+    }
+
+    form {
+        width: 90%;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+}
+
+
+
+
+
