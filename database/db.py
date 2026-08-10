@@ -64,17 +64,4 @@ def get_items():
 if __name__=="__main__":
     create_table()
 
-    add_item(
-        "lost",
-        "Black Wallet",
-        "Wallet",
-        "Black leather wallet with college ID",
-        "College Canteen",
-        "2026-08-09",
-        "wallet.jpg",
-        "9876543210"
-    )
-
-    items = get_items()
-    for item in items:
-        print(dict(item))
+    print("Database ready")
