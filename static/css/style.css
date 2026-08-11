@@ -78,11 +78,143 @@ header h1{
 }
 
 .choice-card:hover{
-    transform: scale(1.5);
+    transform: scale(1.25);
 }
 
+/* How It Works */
+.how-it-works {
+    padding: 80px 5%;
+    text-align: center;
+}
 
-/*css report lost*/
+.section-heading h2 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.section-heading p {
+    font-size: 18px;
+    color: #aaa;
+    margin-bottom: 50px;
+}
+
+.steps-container {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.step-card {
+    width: 220px;
+    padding: 30px 20px;
+    background: #232522;
+    border-radius: 20px;
+    text-align: center;
+    transition: 0.3s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-8px);
+}
+
+.step-number {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.step-card h3 {
+    font-size: 22px;
+    margin: 15px 0 10px;
+}
+
+.step-card p {
+    font-size: 15px;
+    color: #aaa;
+    line-height: 1.6;
+}
+
+.how-it-works {
+    padding: 55px 5%;
+}
+
+/* Live Stats */
+.live-stats {
+    padding: 70px 5%;
+    text-align: center;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    width: 200px;
+    padding: 25px 20px;
+    background: #232522;
+    border-radius: 20px;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.live-stats {
+    padding: 45px 5%;
+}
+
+/* Footer */
+.site-footer {
+    margin-top: 60px;
+    padding: 40px 5% 20px;
+    background: #181a18;
+    border-top: 1px solid #333;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-brand h2 {
+    margin-bottom: 8px;
+}
+
+.footer-brand p {
+    color: #aaa;
+}
+
+.footer-links {
+    display: flex;
+    gap: 25px;
+}
+
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+}
+
+/*css report lost & found*/
 body{
 
      font-family: 'Inter' ,sans-serif;
