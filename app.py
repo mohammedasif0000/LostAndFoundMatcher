@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from database.db import add_item, add_user, get_user_by_username
+from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password
 from werkzeug.security import generate_password_hash
 import re
 from werkzeug.security import check_password_hash
@@ -134,6 +134,32 @@ def login():
         session["user_id"] = user["id"]
         return redirect(url_for("dashboard"))
     return render_template("login.html")
+
+@app.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        user = get_user_by_email(email)
+        if user is None:
+            return "No account found with this email"
+        if password != confirm_password:
+            return "Passwords do not match"
+        if len(password) < 8:
+            return "Password must be at least 8 characters long"
+        if not re.search(r"[A-Z]", password):
+            return "Password must contain an uppercase letter"
+        if not re.search(r"[a-z]", password):
+            return "Password must contain a lowercase letter"
+        if not re.search(r"\d", password):
+            return "Password must contain a number"
+        if not re.search(r"[!@#$%^&*]", password):
+            return "Password must contain a special character"
+        password_hash = generate_password_hash(password)
+        update_password(email, password_hash)
+        return redirect(url_for("login"))
+    return render_template("forgot_password.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

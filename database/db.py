@@ -88,7 +88,6 @@ def get_items():
         "SELECT * FROM items"
     ).fetchall()
     connection.close()
-
     return items
 
 def get_users():
@@ -99,14 +98,34 @@ def get_users():
 
 def get_user_by_username(username):
     connection = get_db_connection()
-
     user = connection.execute(
         "SELECT * FROM Users WHERE username = ?",
         (username,)
     ).fetchone()
-
     connection.close()
     return user
+
+def get_user_by_email(email):
+    connection = get_db_connection()
+    user = connection.execute(
+        "SELECT * FROM Users WHERE email = ?",
+        (email,)
+    ).fetchone()
+    connection.close()
+    return user
+
+def update_password(email, password_hash):
+    connection = get_db_connection()
+    connection.execute(
+        """
+        UPDATE Users
+        SET password_hash = ?
+        WHERE email = ?
+        """,
+        (password_hash, email)
+    )
+    connection.commit()
+    connection.close()
 
 if __name__=="__main__":
     create_table()
