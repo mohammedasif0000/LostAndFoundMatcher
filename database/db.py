@@ -19,7 +19,9 @@ def create_table():
             location TEXT NOT NULL,
             date TEXT NOT NULL,
             image TEXT,
-            contact TEXT NOT NULL
+            contact TEXT NOT NULL,
+            identifying_feature TEXT,
+            secret_detail TEXT
         )
     """)
     connection.commit()
@@ -55,7 +57,7 @@ def add_user(username, email, password_hash):
     connection.close()
     return True
 
-def add_item(item_type,item_name,category,description,location,date,image,contact):
+def add_item(item_type,item_name,category,description,location,date,image,contact,identifying_feature,secret_detail):
     connection = get_db_connection()
     connection.execute("""
         INSERT INTO items (
@@ -66,9 +68,11 @@ def add_item(item_type,item_name,category,description,location,date,image,contac
             location,
             date,
             image,
-            contact
+            contact,
+            identifying_feature,
+            secret_detail
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         item_type,
         item_name,
@@ -77,10 +81,14 @@ def add_item(item_type,item_name,category,description,location,date,image,contac
         location,
         date,
         image,
-        contact
+        contact,
+        identifying_feature,
+        secret_detail
     ))
     connection.commit()
+    item_id = connection.execute("SELECT last_insert_rowid()").fetchone()[0]
     connection.close()
+    return item_id
 
 def get_items():
     connection = get_db_connection()
@@ -101,6 +109,15 @@ def get_user_by_username(username):
     user = connection.execute(
         "SELECT * FROM Users WHERE username = ?",
         (username,)
+    ).fetchone()
+    connection.close()
+    return user
+
+def get_user_by_id(user_id):
+    connection = get_db_connection()
+    user = connection.execute(
+        "SELECT * FROM Users WHERE id = ?",
+        (user_id,)
     ).fetchone()
     connection.close()
     return user
@@ -127,7 +144,48 @@ def update_password(email, password_hash):
     connection.commit()
     connection.close()
 
+def update_items_table():
+    connection = get_db_connection()
+    try:
+        connection.execute(
+            "ALTER TABLE Items ADD COLUMN identifying_feature TEXT"
+        )
+        connection.execute(
+            "ALTER TABLE Items ADD COLUMN secret_detail TEXT"
+        )
+        connection.commit()
+        print("Items table updated")
+    except sqlite3.OperationalError as error:
+        print("Update:", error)
+    finally:
+        connection.close()
+
+def create_verification_table():
+    connection = get_db_connection()
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS Verification (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            item_id INTEGER NOT NULL,
+            claimant_id INTEGER NOT NULL,
+            identifying_feature TEXT,
+            secret_detail TEXT,
+            location TEXT,
+            date TEXT,
+            description TEXT,
+            score INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    connection.commit()
+    connection.close()
+    print("Verification table ready")
+
 if __name__=="__main__":
     create_table()
     create_users_table()
+    update_items_table()
+    create_verification_table()
     print("Database ready")

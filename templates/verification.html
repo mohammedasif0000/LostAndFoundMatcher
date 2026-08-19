@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERIFY ITEM - LOST & FOUND</title>
+</head>
+
+<body>
+
+    <h1>Verify Item Ownership</h1>
+
+    <p>Answer the following questions to help verify that this item belongs to you.</p>
+
+    <form method="POST" action="/verification?item_id=12">
+
+        <label>What unique feature does the item have?</label>
+        <input type="text" name="identifying_feature">
+
+        <label>What secret/private detail identifies the item?</label>
+        <input type="text" name="secret_detail">
+
+        <label>Where did you lose the item?</label>
+        <input type="text" name="location">
+
+        <label>Approximately when did you lose the item?</label>
+        <input type="date" name="date">
+
+        <label>Describe the item.</label>
+        <textarea name="description"></textarea>
+
+        <button type="submit">Submit Verification</button>
+
+    </form>
+
+</body>
+</html>

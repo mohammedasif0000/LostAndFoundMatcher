@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password
+from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password, get_db_connection, get_user_by_id
 from werkzeug.security import generate_password_hash
 import re
 from werkzeug.security import check_password_hash
@@ -20,8 +20,10 @@ def report_lost():
         location = request.form.get("location")
         description = request.form.get("description")
         contact = request.form.get("contact")
-
-        add_item(
+        identifying_feature = request.form.get("identifying_feature", "TEST")
+        secret_detail = request.form.get("secret_detail")
+        print("Identifying feature received:", identifying_feature)
+        item_id = add_item(
             "lost",
             item_name,
             category,
@@ -29,8 +31,11 @@ def report_lost():
             location,
             date,
             None,
-            contact
+            contact,
+            identifying_feature,
+            secret_detail
         )
+        print("New Lost Item ID:", item_id)
         print("LOST ITEM SAVED TO DATABASE")
     return render_template("report_lost.html")
 
@@ -43,6 +48,8 @@ def report_found():
         location = request.form.get("location")
         description = request.form.get("description")
         contact = request.form.get("contact")
+        identifying_feature = request.form.get("identifying_feature")
+        secret_detail = request.form.get("secret_detail")
 
         add_item(
             "found",
@@ -52,7 +59,9 @@ def report_found():
             location,
             date,
             None,
-            contact
+            contact,
+            identifying_feature,
+            secret_detail
         )
         print("FOUND ITEM SAVED TO DATABASE")
     return render_template("report_found.html")
@@ -72,9 +81,80 @@ def match_result():
      found_image = "images/test-found.jpg"
      return render_template("match_result.html",match_score=match_score,lost_item=lost_item,found_item=found_item,lost_category=lost_category,found_category=found_category,lost_location=lost_location,found_location=found_location,lost_date=lost_date,found_date=found_date,lost_image=lost_image,found_image=found_image)
 
-@app.route("/verification")
+@app.route("/verification", methods=["GET", "POST"])
 def verification():
-     return render_template("verification.html")
+    if request.method == "POST":
+        item_id = request.args.get("item_id")
+        print("Item ID:", item_id)
+        connection = get_db_connection()
+        item = connection.execute(
+            "SELECT * FROM Items WHERE id = ?",
+            (item_id,)
+        ).fetchone()
+        connection.close()
+        print("Original item:", item)
+        print("Identifying feature in DB:", item["identifying_feature"])
+        print("Secret Detail in DB:", item["secret_detail"])
+        identifying_feature = request.form["identifying_feature"]
+        secret_detail = request.form["secret_detail"]
+        location = request.form["location"]
+        date = request.form["date"]
+        description = request.form["description"]
+        print(identifying_feature)
+        print(secret_detail)   
+        print(location)
+        print(date)
+        print(description)
+        #SCORE SYSTEM
+        score = 0
+        if identifying_feature.lower().strip() == item["identifying_feature"].lower().strip():
+            score += 30
+        if secret_detail.strip().lower() == item["secret_detail"].strip().lower():
+            score += 25
+        if location.strip().lower() == item["location"].strip().lower():
+            score += 20
+        if date == item["date"]:
+            score += 15
+        if description.strip().lower() == item["description"].strip().lower():
+            score += 10
+        #VERIFICATION RESULT
+        if score >= 80:
+            status = "Verified"
+        elif score >= 60:
+            status = "Needs review"
+        else:
+            status = "Failed"
+        print("Verification Score:", score)
+        print("Verification Status:", status)
+
+        connection = get_db_connection()
+        connection.execute("""
+            INSERT INTO Verification (
+                item_id,
+                claimant_id,
+                identifying_feature,
+                secret_detail,
+                location,
+                date,
+                description,
+                score,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            item_id,
+            session["user_id"],
+            identifying_feature,
+            secret_detail,
+            location,
+            date,
+            description,
+            score,
+            status
+        ))
+        connection.commit()
+        connection.close()
+    return render_template("verification.html")
 
 @app.route("/search")
 def search():
@@ -126,7 +206,7 @@ def login():
         password = request.form.get("password")
         user = get_user_by_username(username)
 
-        if user in None:
+        if user is None:
             return "Invalid username or password"
         
         if not check_password_hash(user["password_hash"], password):
@@ -165,6 +245,14 @@ def forgot_password():
         update_password(email, password_hash)
         return redirect(url_for("login"))
     return render_template("forgot_password.html")
+
+@app.route("/dashboard")
+def dashboard():
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+    user = get_user_by_id(user_id)
+    return render_template("dashboard.html", user=user)
 
 if __name__ == "__main__":
     app.run(debug=True)
