@@ -1,29 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SIGN UP - LOST & FOUND</title>
-    </head>
 
-    <body>
-        <h1>Create Account</h1>
-        <form method="POST">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            <label>Username</label>
-            <input type="text" name="username" required>
-            <br><br>
-            <label>Email</label>
-            <input type="email" name="email" required>
-            <br><br>
-            <label>Password</label>
-            <input type="password" name="password" required>
-            <br><br>
-            <label>Conform Password</label>
-            <input type="password" name="confirm_password" required>
-            <br><br>
-            <button type="submit">Sign Up</button>
+    <title>Sign Up | LOST & FOUND</title>
 
-        </form>
-    </body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="auth-page">
+
+    <main class="auth-page-main">
+
+        <section class="auth-card anim-popIn">
+
+            <div class="auth-header">
+
+                <a href="{{ url_for('home') }}" class="auth-brand">
+                    LOST & FOUND
+                </a>
+
+                <p class="auth-eyebrow">
+                    JOIN US
+                </p>
+
+                <h1>
+                    Create Account
+                </h1>
+
+                <p>
+                    Create an account to report and manage lost and found items.
+                </p>
+
+            </div>
+
+
+            <form method="POST" class="auth-form">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="confirm_password">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Confirm your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button type="submit" class="btn-primary">
+                    Sign Up
+                </button>
+
+            </form>
+
+
+            <div class="auth-links">
+
+                <p>
+                    Already have an account?
+                    <a href="{{ url_for('login') }}">
+                        Login
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
 </html>

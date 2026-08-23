@@ -1,38 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIN - LOST & FOUND</title>
+
+    <title>Login | LOST & FOUND</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
 
-<body>
+<body class="auth-page">
 
-    <h1>Login</h1>
+    <main class="auth-page-main">
 
-    <form method="POST">
+        <section class="auth-card anim-popIn">
 
-        <label>Username</label>
-        <input type="text" name="username" required>
+            <div class="auth-header">
 
-        <br><br>
+                <a href="{{ url_for('home') }}" class="auth-brand">
+                    LOST & FOUND
+                </a>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+                <p class="auth-eyebrow">
+                    WELCOME BACK
+                </p>
 
-        <br><br>
+                <h1>
+                    Login
+                </h1>
 
-        <button type="submit">Login</button>
+                <p>
+                    Sign in to manage your lost and found items.
+                </p>
 
-    </form>
+            </div>
 
-    <p>
-        <a href="/signup">Create Account</a>
-    </p>
 
-    <p>
-        <a href="/forgot_password">Forgot Password?</a>
-    </p>
+            <form method="POST" class="auth-form">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter your username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button type="submit" class="btn-primary">
+                    Login
+                </button>
+
+            </form>
+
+
+            <div class="auth-links">
+
+                <a href="{{ url_for('forgot_password') }}">
+                    Forgot Password?
+                </a>
+
+                <p>
+                    Don't have an account?
+                    <a href="{{ url_for('signup') }}">
+                        Create Account
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </body>
 </html>

@@ -1,39 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dashboard | LOST & FOUND</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
 
-<body>
+<body class="dashboard-page">
 
-    <header>
-        <h1>LOST & FOUND</h1>
+    <!-- ================= HEADER ================= -->
+    <header class="site-header">
 
-        <nav>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/report_lost">Report Lost</a>
-            <a href="/report_found">Report Found</a>
-            <a href="/logout">Logout</a>
+        <a href="{{ url_for('dashboard') }}" class="brand">
+
+            <span class="brand-mark">L&F</span>
+
+            <span class="brand-name">
+                LOST & FOUND
+            </span>
+
+        </a>
+
+        <nav class="main-nav">
+
+            <a href="{{ url_for('dashboard') }}" class="active">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('report_lost') }}">
+                Report Lost
+            </a>
+
+            <a href="{{ url_for('report_found') }}">
+                Report Found
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
         </nav>
+
     </header>
 
-    <main>
 
-        <section>
-            <h2>Welcome to LOST & FOUND</h2>
-            <p>Manage your lost & found activity.</p>
+    <!-- ================= MAIN ================= -->
+    <main class="dashboard-main">
+
+
+        <!-- Welcome -->
+        <section class="welcome-banner anim-fadeUp">
+
+            <p class="dashboard-eyebrow">
+                YOUR DASHBOARD
+            </p>
+
+            <h1>
+                Welcome to LOST & FOUND
+            </h1>
+
+            <p>
+                Manage your lost and found activity from one place.
+            </p>
+
         </section>
 
-        <section>
-            <h2>Quick Actions</h2>
 
-            <a href="/report_lost">Report Lost Item</a>
-            <a href="/report_found">Report Found Item</a>
+        <!-- ================= STATS ================= -->
+        <section class="dashboard-stats anim-fadeUp">
+
+            <div class="dashboard-stat-card">
+
+                <span class="dashboard-stat-number">
+                    {{ total_items }}
+                </span>
+
+                <span class="dashboard-stat-label">
+                    Items Reported
+                </span>
+
+            </div>
+
+
+            <div class="dashboard-stat-card">
+
+                <span class="dashboard-stat-number">
+                    {{ lost_items }}
+                </span>
+
+                <span class="dashboard-stat-label">
+                    Items Lost
+                </span>
+
+            </div>
+
+
+            <div class="dashboard-stat-card">
+
+                <span class="dashboard-stat-number">
+                    {{ found_items }}
+                </span>
+
+                <span class="dashboard-stat-label">
+                    Items Found
+                </span>
+
+            </div>
+
+
+            <div class="dashboard-stat-card">
+
+                <span class="dashboard-stat-number">
+                    0
+                </span>
+
+                <span class="dashboard-stat-label">
+                    Items Returned
+                </span>
+
+            </div>
+
         </section>
+
+
+        <!-- ================= QUICK ACTIONS ================= -->
+        <section class="dashboard-section anim-fadeUp">
+
+            <h2 class="dashboard-section-title">
+                QUICK ACTIONS
+            </h2>
+
+
+            <div class="dashboard-actions">
+
+                <a
+                    href="{{ url_for('report_lost') }}"
+                    class="dashboard-action lost-action"
+                >
+
+                    <span class="action-label">
+                        LOST
+                    </span>
+
+                    <h3>
+                        Report a Lost Item
+                    </h3>
+
+                    <p>
+                        Tell us what you lost so we can help find a match.
+                    </p>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('report_found') }}"
+                    class="dashboard-action found-action"
+                >
+
+                    <span class="action-label">
+                        FOUND
+                    </span>
+
+                    <h3>
+                        Report a Found Item
+                    </h3>
+
+                    <p>
+                        Tell us about an item you found and help return it.
+                    </p>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PUZZLE MATCHING ================= -->
+        <section class="dashboard-section anim-fadeUp">
+
+            <h2 class="dashboard-section-title">
+                THE MATCH
+            </h2>
+
+            <p class="dashboard-section-description">
+                Lost and found items come together through matching.
+            </p>
+
+
+            <div class="puzzle-pair">
+
+                <div class="puzzle-half lost">
+
+                    <span class="puzzle-tag">
+                        LOST
+                    </span>
+
+                    <h3 class="puzzle-title">
+                        Something is missing
+                    </h3>
+
+                    <p class="puzzle-sub">
+                        Report your lost item and give it a chance to be found.
+                    </p>
+
+                </div>
+
+
+                <div class="puzzle-half found">
+
+                    <span class="puzzle-tag">
+                        FOUND
+                    </span>
+
+                    <h3 class="puzzle-title">
+                        Something was found
+                    </h3>
+
+                    <p class="puzzle-sub">
+                        Report a found item and help reconnect it with its owner.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= RECENT ACTIVITY ================= -->
+        <section class="dashboard-section anim-fadeUp">
+
+            <h2 class="dashboard-section-title">
+                RECENT ACTIVITY
+            </h2>
+
+
+            <div class="recent-items">
+
+                {% if items %}
+
+                    {% for item in items[-5:]|reverse %}
+
+                        <a
+                            href="{{ url_for('item_details', item_id=item['id']) }}"
+                            class="recent-item"
+                        >
+
+                            <div class="recent-item-info">
+
+                                <span class="recent-item-type {{ item['type'] }}">
+                                    {{ item['type']|upper }}
+                                </span>
+
+                                <h3>
+                                    {{ item['item_name'] }}
+                                </h3>
+
+                                <p>
+                                    {{ item['category']|capitalize }}
+                                    · {{ item['location'] }}
+                                    · {{ item['date'] }}
+                                </p>
+
+                            </div>
+
+                            <div class="recent-item-arrow">
+                                →
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-activity">
+
+                        <div class="empty-icon">
+                            +
+                        </div>
+
+                        <h3>
+                            No activity yet
+                        </h3>
+
+                        <p>
+                            Your reported items and activity will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
 
     </main>
+
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="dashboard-footer">
+
+        <p>
+            LOST & FOUND · Find. Report. Reunite.
+        </p>
+
+    </footer>
+
 
 </body>
 </html>

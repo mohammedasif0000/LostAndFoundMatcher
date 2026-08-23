@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password, get_db_connection, get_user_by_id
+from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password, get_db_connection, get_user_by_id, get_items
 from werkzeug.security import generate_password_hash
 import re
+import os
 from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "lost_and_found_dev_key"
+app.config["UPLOAD_FOLDER"] = "static/uploads"
 
 @app.route("/")
 def home():
@@ -22,7 +25,12 @@ def report_lost():
         contact = request.form.get("contact")
         identifying_feature = request.form.get("identifying_feature", "TEST")
         secret_detail = request.form.get("secret_detail")
-        print("Identifying feature received:", identifying_feature)
+        photo = request.files.get("photos")
+        image_filename = None
+        if photo and photo.filename:
+            filename = secure_filename(photo.filename)
+            image_filename = filename
+            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         item_id = add_item(
             "lost",
             item_name,
@@ -30,7 +38,7 @@ def report_lost():
             description,
             location,
             date,
-            None,
+            image_filename,
             contact,
             identifying_feature,
             secret_detail
@@ -50,7 +58,12 @@ def report_found():
         contact = request.form.get("contact")
         identifying_feature = request.form.get("identifying_feature")
         secret_detail = request.form.get("secret_detail")
-
+        photo = request.files.get("photos")
+        image_filename = None
+        if photo and photo.filename:
+            filename = secure_filename(photo.filename)
+            image_filename = filename
+            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         add_item(
             "found",
             item_name,
@@ -58,7 +71,7 @@ def report_found():
             description,
             location,
             date,
-            None,
+            image_filename,
             contact,
             identifying_feature,
             secret_detail
@@ -196,7 +209,7 @@ def signup():
         if not add_user(username, email, password_hash):
             return "Username or email already exists"
 
-        return "Account created successfully"
+        return redirect(url_for("login"))
     return render_template("signup.html")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -246,13 +259,46 @@ def forgot_password():
         return redirect(url_for("login"))
     return render_template("forgot_password.html")
 
+@app.route("/item/<int:item_id>")
+def item_details(item_id):
+    user_id = session.get("user_id")
+    if user_id is None:
+       return redirect(url_for("login"))
+    connection = get_db_connection()
+    item = connection.execute(
+        "SELECT * FROM items WHERE id = ?",
+        (item_id,)
+    ).fetchone()
+    connection.close()
+    if item is None:
+        return "Item not found", 404
+    return render_template(
+        "item_details.html",
+        item=item
+    )
+
 @app.route("/dashboard")
 def dashboard():
     user_id = session.get("user_id")
+
     if user_id is None:
         return redirect(url_for("login"))
+
     user = get_user_by_id(user_id)
-    return render_template("dashboard.html", user=user)
+    items = get_items()
+
+    total_items = len(items)
+    found_items = sum(1 for item in items if item["type"] == "found")
+    lost_items = sum(1 for item in items if item["type"] == "lost")
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+        items=items,
+        total_items=total_items,
+        found_items=found_items,
+        lost_items=lost_items
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

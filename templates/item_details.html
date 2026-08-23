@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ item['item_name'] }} | LOST & FOUND</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <header class="site-header">
+
+        <a href="{{ url_for('dashboard') }}" class="brand">
+
+            <span class="brand-mark">
+                L&F
+            </span>
+
+            <span class="brand-name">
+                LOST & FOUND
+            </span>
+
+        </a>
+
+        <nav class="main-nav">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('report_lost') }}">
+                Report Lost
+            </a>
+
+            <a href="{{ url_for('report_found') }}">
+                Report Found
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main class="dashboard-main">
+
+        <section class="welcome-banner">
+
+            <p class="dashboard-eyebrow">
+                ITEM DETAILS
+            </p>
+
+            <h1>
+                {{ item['item_name'] }}
+            </h1>
+
+            <p>
+                Full information about this reported item.
+            </p>
+
+        </section>
+
+
+        <section class="dashboard-section">
+
+            <div class="recent-item">
+
+                <div class="recent-item-info">
+
+                    <span class="recent-item-type {{ item['type'] }}">
+                        {{ item['type']|upper }}
+                    </span>
+
+                    <h3>
+                        {{ item['item_name'] }}
+                    </h3>
+
+                    <p>
+                        <strong>Category:</strong>
+                        {{ item['category']|capitalize }}
+                    </p>
+
+                    <p>
+                        <strong>Location:</strong>
+                        {{ item['location'] }}
+                    </p>
+
+                    <p>
+                        <strong>Date:</strong>
+                        {{ item['date'] }}
+                    </p>
+
+                    <p>
+                        <strong>Description:</strong>
+                        {{ item['description'] }}
+                    </p>
+
+                    <p>
+                        <strong>Contact:</strong>
+                        {{ item['contact'] }}
+                    </p>
+
+                    {% if item['image'] %}
+
+                        <p>
+                            <strong>Image:</strong>
+                        </p>
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + item['image']) }}"
+                            alt="{{ item['item_name'] }}"
+                            style="max-width: 400px; width: 100%; border-radius: 15px;"
+                        >
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-section">
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="btn-primary"
+            >
+                ← Back to Dashboard
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <footer class="dashboard-footer">
+
+        <p>
+            LOST & FOUND · Find. Report. Reunite.
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

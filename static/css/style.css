@@ -2,7 +2,7 @@ body{
     background: linear-gradient(
         180deg,
         #131515 0%,
-        #1a1b1b 100%
+        #1A1B1B 100%
     );
     margin: 0;
     color: #fffafb;
@@ -785,4 +785,14 @@ main.dashboard-main { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px;
 =================================================================== */
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
+}
+
+/* HOME PAGE — keep the original dark design */
+body.home-page {
+    background: linear-gradient(
+        180deg,
+        #131515 0%,
+        #1A1B1B 100%
+    );
+    color: #fffafb;
 }
