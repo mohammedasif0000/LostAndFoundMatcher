@@ -386,3 +386,403 @@ form {
         font-size: 20px;
     }
 }
+
+/*for four dashboard,login page,signup*/
+/* ===================================================================
+   DESIGN TOKENS — "The Match": lost + found are two puzzle pieces
+   that click together. Used consistently across every page.
+=================================================================== */
+:root {
+    --bg: #F5F3FB;
+    --surface: #FFFFFF;
+    --ink: #1E1B4B;
+    --ink-soft: #6E6795;
+    --lost: #E4467E;
+    --lost-soft: #FCE4EE;
+    --found: #00A9A5;
+    --found-soft: #DFF7F6;
+    --glow: #FFD166;
+    --border: #E3DFF5;
+
+    --font-display: 'Sora', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.5;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ===================================================================
+   SHARED ANIMATIONS
+=================================================================== */
+@keyframes slideLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideRight { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(0.85) translateY(16px); } 70% { opacity: 1; transform: scale(1.02) translateY(-2px); } 100% { transform: scale(1) translateY(0); } }
+@keyframes glowPulse { 0% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0); } 50% { box-shadow: 0 0 24px 6px rgba(255, 209, 102, 0.55); } 100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.anim-fadeUp { animation: fadeUp 0.5s ease both; }
+
+/* ===================================================================
+   HEADER (dashboard)
+=================================================================== */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.brand-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+}
+
+.main-nav { display: flex; gap: 6px; }
+
+.main-nav a {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.main-nav a:hover { background: var(--bg); color: var(--ink); }
+.main-nav a.active { background: var(--ink); color: #fff; }
+
+/* ===================================================================
+   MAIN LAYOUT (dashboard)
+=================================================================== */
+main.dashboard-main { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+.welcome-banner { margin-bottom: 40px; }
+
+.welcome-banner h1 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.welcome-banner p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+.stat-row { display: flex; gap: 32px; margin-top: 20px; }
+
+.stat-number {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--ink);
+    display: block;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+}
+
+/* ===================================================================
+   PUZZLE PAIR — the signature: Lost + Found as two interlocking
+   puzzle-piece halves. Slide in from opposite sides and glow-pulse
+   when they meet, since this is literally what the app's matching
+   feature does.
+=================================================================== */
+.puzzle-pair {
+    display: flex;
+    align-items: stretch;
+    border-radius: 16px;
+    animation: glowPulse 0.9s ease both 0.55s;
+}
+
+.puzzle-half {
+    position: relative;
+    flex: 1;
+    padding: 28px 24px;
+    overflow: visible;
+}
+
+.puzzle-half.lost {
+    background: var(--lost-soft);
+    border-radius: 16px 0 0 16px;
+    animation: slideLeft 0.55s cubic-bezier(.22,1,.36,1) both;
+}
+
+.puzzle-half.found {
+    background: var(--found-soft);
+    border-radius: 0 16px 16px 0;
+    animation: slideRight 0.55s cubic-bezier(.22,1,.36,1) both 0.08s;
+}
+
+/* the tab bump, drawn as a circle overlapping the shared edge */
+.puzzle-half.lost::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -16px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--lost-soft);
+}
+
+/* the notch that "erases" a bite from the found piece, using the page bg color */
+.puzzle-half.found::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg);
+    z-index: 1;
+}
+
+.puzzle-pair:hover .puzzle-half.lost { transform: translateX(-6px); transition: transform 0.2s ease; }
+.puzzle-pair:hover .puzzle-half.found { transform: translateX(6px); transition: transform 0.2s ease; }
+
+.puzzle-tag {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.puzzle-half.lost .puzzle-tag { color: var(--lost); }
+.puzzle-half.found .puzzle-tag { color: var(--found); }
+
+.puzzle-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 4px;
+    position: relative;
+    z-index: 2;
+}
+
+.puzzle-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* ===================================================================
+   AUTH PAGES — a single puzzle piece "clicking" into the platform
+=================================================================== */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.auth-piece {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 40px 32px 32px;
+    text-align: center;
+    box-shadow: 0 20px 40px -24px rgba(30, 27, 75, 0.25);
+    animation: popIn 0.55s cubic-bezier(.22,1.4,.4,1) both, glowPulse 0.9s ease both 0.5s;
+}
+
+/* the tab connecting the piece to "the system" above */
+.auth-piece::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+}
+
+.auth-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-piece h1 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-piece > p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.field input {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field input::placeholder { color: #A79FC9; }
+
+.field input:focus {
+    border-color: var(--found);
+    box-shadow: 0 0 0 3px rgba(0, 169, 165, 0.18);
+    background: var(--surface);
+}
+
+.btn-primary {
+    margin-top: 8px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover { background: #2E2A6B; }
+.btn-primary:active { transform: scale(0.98); }
+
+.auth-links {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-links a { font-weight: 500; color: var(--ink-soft); transition: color 0.15s ease; }
+.auth-links a:hover { color: var(--ink); }
+.auth-sep { color: var(--border); }
+
+/* ===================================================================
+   RESPONSIVE
+=================================================================== */
+@media (max-width: 640px) {
+    .site-header { padding: 14px 16px; }
+    .main-nav a { padding: 6px 10px; font-size: 13px; }
+    .puzzle-pair { flex-direction: column; }
+    .puzzle-half.lost { border-radius: 16px 16px 0 0; }
+    .puzzle-half.found { border-radius: 0 0 16px 16px; }
+    .puzzle-half.lost::after { right: 50%; top: auto; bottom: -16px; transform: translateX(50%); }
+    .puzzle-half.found::before { left: 50%; top: 0; transform: translateX(-50%); }
+}
+
+@media (max-width: 420px) {
+    .auth-piece { padding: 32px 22px 26px; }
+}
+
+/* ===================================================================
+   ACCESSIBILITY — respect reduced motion
+=================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}
