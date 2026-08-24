@@ -36,23 +36,124 @@
             <br>
 
             <!-- Category -->
-            <li>
-                <b>Category:</b>
-                <select name="category" required>
-                    <option value="">Select category</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="documents">Documents</option>
-                    <option value="wallet">Wallet / Money</option>
-                    <option value="keys">Keys</option>
-                    <option value="bags">Bags</option>
-                    <option value="clothing">Clothing</option>
-                    <option value="other">Other</option>
-                </select>
+    <li>
 
-                <ul>
-                    <li>The category of the item you lost</li>
-                </ul>
-            </li>
+        <b>Category:</b>
+
+        <!-- Hidden real select - Flask still receives this value -->
+        <select
+            name="category"
+            id="lostCategory"
+            required
+            class="real-category-select"
+        >
+            <option value="">Select category</option>
+            <option value="electronics">Electronics</option>
+            <option value="documents">Documents</option>
+            <option value="wallet">Wallet / Money</option>
+            <option value="keys">Keys</option>
+            <option value="bags">Bags</option>
+            <option value="clothing">Clothing</option>
+            <option value="other">Other</option>
+        </select>
+
+
+        <!-- Custom dropdown -->
+
+        <div
+            class="custom-dropdown"
+            id="lostCategoryDropdown"
+        >
+
+            <button
+                type="button"
+                class="custom-dropdown-button"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+            >
+
+                <span class="custom-dropdown-text">
+                    Select category
+                </span>
+
+                <span class="custom-dropdown-arrow">
+                    ▾
+                </span>
+
+            </button>
+
+
+            <div
+                class="custom-dropdown-menu"
+                role="listbox"
+            >
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="electronics"
+                    role="option"
+                >
+                    Electronics
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="documents"
+                    role="option"
+                >
+                    Documents
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="wallet"
+                    role="option"
+                >
+                    Wallet / Money
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="keys"
+                    role="option"
+                >
+                    Keys
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="bags"
+                    role="option"
+                >
+                    Bags
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="clothing"
+                    role="option"
+                >
+                    Clothing
+                </div>
+
+                <div
+                    class="custom-dropdown-option"
+                    data-value="other"
+                    role="option"
+                >
+                    Other
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <ul>
+            <li>The category of the item you lost</li>
+        </ul>
+
+    </li>
 
             <br>
 
@@ -165,5 +266,175 @@
     </form>
 
 </body>
+
+<script>
+
+    const lostCategorySelect =
+        document.getElementById("lostCategory");
+
+    const lostCategoryDropdown =
+        document.getElementById("lostCategoryDropdown");
+
+    const lostCategoryButton =
+        lostCategoryDropdown.querySelector(
+            ".custom-dropdown-button"
+        );
+
+    const lostCategoryText =
+        lostCategoryDropdown.querySelector(
+            ".custom-dropdown-text"
+        );
+
+    const lostCategoryOptions =
+        lostCategoryDropdown.querySelectorAll(
+            ".custom-dropdown-option"
+        );
+
+
+    /* Open / close dropdown */
+
+    lostCategoryButton.addEventListener(
+        "click",
+        function () {
+
+            lostCategoryDropdown.classList.toggle(
+                "open"
+            );
+
+            const isOpen =
+                lostCategoryDropdown.classList.contains(
+                    "open"
+                );
+
+            lostCategoryButton.setAttribute(
+                "aria-expanded",
+                isOpen
+            );
+
+        }
+    );
+
+
+    /* Select category */
+
+    lostCategoryOptions.forEach(
+        function (option) {
+
+            option.addEventListener(
+                "click",
+                function () {
+
+                    const value =
+                        option.dataset.value;
+
+                    const text =
+                        option.textContent.trim();
+
+
+                    /* Update real select */
+
+                    lostCategorySelect.value =
+                        value;
+
+
+                    /* Update visible text */
+
+                    lostCategoryText.textContent =
+                        text;
+
+
+                    /* Remove previous selected state */
+
+                    lostCategoryOptions.forEach(
+                        function (item) {
+
+                            item.classList.remove(
+                                "selected"
+                            );
+
+                        }
+                    );
+
+
+                    /* Mark current option */
+
+                    option.classList.add(
+                        "selected"
+                    );
+
+
+                    /* Close */
+
+                    lostCategoryDropdown.classList.remove(
+                        "open"
+                    );
+
+                    lostCategoryButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    /* Close when clicking outside */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !lostCategoryDropdown.contains(
+                    event.target
+                )
+            ) {
+
+                lostCategoryDropdown.classList.remove(
+                    "open"
+                );
+
+                lostCategoryButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+
+        }
+    );
+
+
+    /* Prevent submitting without category */
+
+    document.querySelector("form").addEventListener(
+        "submit",
+        function (event) {
+
+            if (
+                lostCategorySelect.value === ""
+            ) {
+
+                event.preventDefault();
+
+                lostCategoryDropdown
+                    .querySelector(
+                        ".custom-dropdown-button"
+                    )
+                    .focus();
+
+                alert(
+                    "Please select a category."
+                );
+
+            }
+
+        }
+    );
+
+</script>
 
 </html>

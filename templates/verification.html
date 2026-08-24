@@ -1,37 +1,732 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERIFY ITEM - LOST & FOUND</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Verify Item | LOST & FOUND
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* =====================================================
+           VERIFICATION PAGE
+        ===================================================== */
+
+        .verification-page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .verification-card {
+            background: var(--surface, #ffffff);
+            border: 1px solid var(--border, #ddd9f5);
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 12px 35px rgba(30, 27, 75, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .verification-item {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .verification-image {
+            width: 100%;
+            height: 210px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg, #f5f3fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .verification-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .verification-no-image {
+            color: var(--ink-soft, #68658a);
+            font-size: 13px;
+        }
+
+        .verification-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #e9f8f7;
+            color: #087f79;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .verification-item h2 {
+            font-family: var(--font-display, "Sora", sans-serif);
+            margin: 10px 0 18px;
+            color: var(--ink, #17144d);
+        }
+
+        .verification-item p {
+            margin: 7px 0;
+            color: var(--ink-soft, #68658a);
+            font-size: 14px;
+        }
+
+        .verification-item strong {
+            color: var(--ink, #17144d);
+        }
+
+        .verification-intro {
+            margin-bottom: 25px;
+        }
+
+        .verification-intro h2 {
+            font-family: var(--font-display, "Sora", sans-serif);
+            color: var(--ink, #17144d);
+            margin-bottom: 8px;
+        }
+
+        .verification-intro p {
+            color: var(--ink-soft, #68658a);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .verification-warning {
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            background: #fff8e8;
+            border: 1px solid #f0dfaa;
+            color: #735d18;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .verification-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .verification-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .verification-field label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink, #17144d);
+        }
+
+        .verification-field input,
+        .verification-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 14px;
+            border: 1px solid var(--border, #d9d5ef);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--ink, #17144d);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .verification-field input:focus,
+        .verification-field textarea:focus {
+            border-color: #6d61d9;
+            box-shadow: 0 0 0 3px rgba(109, 97, 217, 0.10);
+        }
+
+        .verification-field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .verification-help {
+            color: var(--ink-soft, #68658a);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .verification-submit {
+            border: none;
+            cursor: pointer;
+            padding: 14px 20px;
+            border-radius: 12px;
+            background: var(--ink, #17144d);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .verification-submit:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .verification-result {
+            text-align: center;
+            padding: 35px 25px;
+        }
+
+        .verification-result-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e8f8f0;
+            color: #16834e;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .verification-result h2 {
+            font-family: var(--font-display, "Sora", sans-serif);
+            color: var(--ink, #17144d);
+            margin-bottom: 8px;
+        }
+
+        .verification-result p {
+            color: var(--ink-soft, #68658a);
+        }
+
+        .verification-score {
+            margin: 25px auto;
+            padding: 18px;
+            max-width: 300px;
+            border-radius: 16px;
+            background: var(--bg, #f5f3fc);
+        }
+
+        .verification-score-number {
+            font-family: var(--font-display, "Sora", sans-serif);
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--ink, #17144d);
+        }
+
+        .verification-score-label {
+            margin-top: 3px;
+            font-size: 12px;
+            color: var(--ink-soft, #68658a);
+        }
+
+        .verification-status-result {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #e8f8f0;
+            color: #16834e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .verification-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .verification-back {
+            display: inline-block;
+            padding: 12px 18px;
+            border: 1px solid var(--border, #d9d5ef);
+            border-radius: 12px;
+            color: var(--ink, #17144d);
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 700px) {
+
+            .verification-item {
+                grid-template-columns: 1fr;
+            }
+
+            .verification-image {
+                height: 240px;
+            }
+
+            .verification-card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
-    <h1>Verify Item Ownership</h1>
 
-    <p>Answer the following questions to help verify that this item belongs to you.</p>
+<header class="site-header">
 
-    <form method="POST" action="/verification?item_id=12">
+    <a
+        href="{{ url_for('dashboard') }}"
+        class="brand"
+    >
 
-        <label>What unique feature does the item have?</label>
-        <input type="text" name="identifying_feature">
+        <span class="brand-mark">
+            L&F
+        </span>
 
-        <label>What secret/private detail identifies the item?</label>
-        <input type="text" name="secret_detail">
+        <span class="brand-name">
+            LOST & FOUND
+        </span>
 
-        <label>Where did you lose the item?</label>
-        <input type="text" name="location">
+    </a>
 
-        <label>Approximately when did you lose the item?</label>
-        <input type="date" name="date">
 
-        <label>Describe the item.</label>
-        <textarea name="description"></textarea>
+    <nav class="main-nav">
 
-        <button type="submit">Submit Verification</button>
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
 
-    </form>
+        <a href="{{ url_for('items') }}">
+            All Items
+        </a>
+
+        <a href="{{ url_for('report_lost') }}">
+            Report Lost
+        </a>
+
+        <a href="{{ url_for('report_found') }}">
+            Report Found
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<main class="dashboard-main">
+
+
+<div class="verification-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <section class="welcome-banner">
+
+        <p class="dashboard-eyebrow">
+            OWNERSHIP VERIFICATION
+        </p>
+
+        <h1>
+            Verify This Item
+        </h1>
+
+        <p>
+            Answer a few questions to help confirm that this
+            reported item belongs to you.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ITEM INFORMATION
+    ====================================================== -->
+
+    <section class="verification-card">
+
+        <div class="verification-item">
+
+
+            <div class="verification-image">
+
+                {% if item['image'] %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='uploads/' + item['image']
+                        ) }}"
+                        alt="{{ item['item_name'] }}"
+                    >
+
+                {% else %}
+
+                    <div class="verification-no-image">
+                        No Image
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <div>
+
+                <span class="verification-status">
+                    FOUND ITEM
+                </span>
+
+                <h2>
+                    {{ item['item_name'] }}
+                </h2>
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ item['category']|capitalize }}
+                </p>
+
+                <p>
+                    <strong>Location:</strong>
+                    {{ item['location'] }}
+                </p>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ item['date'] }}
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    {% if verification_submitted %}
+
+
+        <!-- =================================================
+             VERIFICATION RESULT
+        ================================================== -->
+
+        <section class="verification-card verification-result">
+
+            <div class="verification-result-icon">
+                ✓
+            </div>
+
+
+            <h2>
+                Verification Submitted
+            </h2>
+
+
+            <p>
+                Your answers have been checked against the
+                information stored for this item.
+            </p>
+
+
+            <div class="verification-score">
+
+                <div class="verification-score-number">
+                    {{ score }}%
+                </div>
+
+                <div class="verification-score-label">
+                    Verification Score
+                </div>
+
+            </div>
+
+
+            <span class="verification-status-result">
+                {{ status }}
+            </span>
+
+
+            {% if status == "Verified" %}
+
+                <p style="margin-top: 20px;">
+                    The information you provided strongly matches
+                    the reported item.
+                </p>
+
+            {% elif status == "Needs review" %}
+
+                <p style="margin-top: 20px;">
+                    Your answers partially match the reported item.
+                    Further review may be required.
+                </p>
+
+            {% else %}
+
+                <p style="margin-top: 20px;">
+                    The provided information did not sufficiently
+                    match the reported item.
+                </p>
+
+            {% endif %}
+
+
+            <div class="verification-actions">
+
+                {% if status == "Verified" %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('mark_returned', item_id=item['id']) }}"
+                        style="margin: 0;"
+                    >
+
+                        <button
+                            type="submit"
+                            class="verification-back"
+                            style="cursor: pointer; border: 1px solid var(--border, #d9d5ef);"
+                        >
+                            ✓ Mark as Returned
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+
+                <a
+                    href="{{ url_for('items') }}"
+                    class="verification-back"
+                >
+                    ← Back to All Items
+                </a>
+
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="verification-back"
+                >
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </section>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             VERIFICATION FORM
+        ================================================== -->
+
+        <section class="verification-card">
+
+            <div class="verification-intro">
+
+                <h2>
+                    Ownership Questions
+                </h2>
+
+                <p>
+                    Provide the details you remember about the
+                    item. These answers will be compared with
+                    the original report.
+                </p>
+
+            </div>
+
+
+            <div class="verification-warning">
+
+                🔒 Some verification information is private.
+                Only your submitted answers are used for
+                verification. The original private details are
+                never displayed publicly.
+
+            </div>
+
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'verification',
+                    item_id=item['id']
+                ) }}"
+                class="verification-form"
+            >
+
+
+                <!-- IDENTIFYING FEATURE -->
+
+                <div class="verification-field">
+
+                    <label for="identifying_feature">
+                        What unique feature does the item have?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="identifying_feature"
+                        name="identifying_feature"
+                        placeholder="Example: Small scratch on the left side"
+                        required
+                    >
+
+                    <span class="verification-help">
+                        Mention a feature that is unique to your item.
+                    </span>
+
+                </div>
+
+
+
+                <!-- SECRET DETAIL -->
+
+                <div class="verification-field">
+
+                    <label for="secret_detail">
+                        What secret/private detail identifies the item?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="secret_detail"
+                        name="secret_detail"
+                        placeholder="Enter a private detail only the owner would know"
+                        required
+                    >
+
+                    <span class="verification-help">
+                        Do not worry — the original private detail
+                        is never shown on this page.
+                    </span>
+
+                </div>
+
+
+
+                <!-- LOCATION -->
+
+                <div class="verification-field">
+
+                    <label for="location">
+                        Where did you lose the item?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        placeholder="Example: College Library"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- DATE -->
+
+                <div class="verification-field">
+
+                    <label for="date">
+                        Approximately when did you lose the item?
+                    </label>
+
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="verification-field">
+
+                    <label for="description">
+                        Describe the item.
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe the item, its appearance, condition, or other details..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+
+                <button
+                    type="submit"
+                    class="verification-submit"
+                >
+                    Submit Verification →
+                </button>
+
+
+            </form>
+
+        </section>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</main>
+
+
+
+<footer class="dashboard-footer">
+
+    <p>
+        LOST & FOUND · Find. Report. Reunite.
+    </p>
+
+</footer>
+
 
 </body>
+
 </html>

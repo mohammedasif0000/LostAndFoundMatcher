@@ -397,12 +397,12 @@ form {
     --surface: #FFFFFF;
     --ink: #1E1B4B;
     --ink-soft: #6E6795;
-    --lost: #E4467E;
+    --lost: #8c2549;
     --lost-soft: #FCE4EE;
-    --found: #00A9A5;
+    --found: #216867;
     --found-soft: #DFF7F6;
-    --glow: #FFD166;
-    --border: #E3DFF5;
+    --glow: #e0a827;
+    --border: #877bbf;
 
     --font-display: 'Sora', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -795,4 +795,655 @@ body.home-page {
         #1A1B1B 100%
     );
     color: #fffafb;
+}
+
+
+/* ============================================================
+   ALL REPORTED ITEMS
+============================================================ */
+
+.items-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 50px 24px 80px;
+}
+
+.items-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.items-eyebrow {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+}
+
+.items-header h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    margin: 0 0 8px;
+    color: var(--ink);
+}
+
+.items-header > p:last-child {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+
+/* ================= SEARCH & FILTERS ================= */
+
+.items-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px -20px rgba(30, 27, 75, 0.35);
+}
+
+.items-controls input,
+.items-controls select {
+    font-family: var(--font-body);
+    font-size: 14px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    outline: none;
+}
+
+.items-controls input {
+    flex: 1;
+}
+
+.items-controls select {
+    min-width: 170px;
+    cursor: pointer;
+}
+
+.items-controls input:focus,
+.items-controls select:focus {
+    border-color: var(--found);
+    box-shadow: 0 0 0 3px rgba(0, 169, 165, 0.12);
+}
+
+
+/* ================= ITEM GRID ================= */
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+
+/* ================= ITEM CARD ================= */
+
+.item-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    box-shadow: 0 12px 30px -22px rgba(30, 27, 75, 0.35);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+    border-color: #CEC8E8;
+    box-shadow: 0 18px 35px -20px rgba(30, 27, 75, 0.45);
+}
+
+
+/* ================= ITEM IMAGE ================= */
+
+.item-card-image,
+.item-card-no-image {
+    width: 100%;
+    height: 210px;
+}
+
+.item-card-image {
+    display: block;
+    object-fit: cover;
+    background: #EEEAF8;
+}
+
+.item-card-no-image {
+    display: grid;
+    place-items: center;
+    background: #EEEAF8;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+
+/* ================= ITEM CONTENT ================= */
+
+.item-card-content {
+    padding: 20px;
+}
+
+.item-card-type {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.item-card-type.lost {
+    background: var(--lost-soft);
+    color: var(--lost);
+}
+
+.item-card-type.found {
+    background: var(--found-soft);
+    color: var(--found);
+}
+
+.item-card h2 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin: 12px 0 12px;
+    color: var(--ink);
+}
+
+.item-card-content p {
+    margin: 5px 0;
+    color: var(--ink-soft);
+    font-size: 12px;
+}
+
+
+/* ================= EMPTY STATE ================= */
+
+.items-empty {
+    grid-column: 1 / -1;
+
+    text-align: center;
+    padding: 60px 25px;
+
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.items-empty h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+
+.items-empty p {
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 850px) {
+
+    .items-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 640px) {
+
+    .items-main {
+        padding: 35px 16px 60px;
+    }
+
+    .items-header h1 {
+        font-size: 26px;
+    }
+
+    .items-controls {
+        flex-direction: column;
+    }
+
+    .items-controls select {
+        width: 100%;
+    }
+
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ============================================================
+   VIEW ALL ITEMS BUTTON
+============================================================ */
+
+.view-all-items {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.view-all-items-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 22px;
+    border-radius: 999px;
+
+    background: var(--ink);
+    color: #fff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.view-all-items-button:hover {
+    background: #2E2A6B;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -10px rgba(30, 27, 75, 0.5);
+}
+
+
+/* ============================================================
+   ITEMS RESULT COUNT
+============================================================ */
+
+.items-result-info {
+    margin: -16px 0 20px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.items-result-info span {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+
+/* ============================================================
+   ALL REPORTED ITEMS - SEARCH & FILTER CONTROLS
+   Fixes global input styling from older report forms
+============================================================ */
+.items-controls {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 20px;
+
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 12px;
+
+    padding: 14px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    box-shadow: 0 10px 30px -20px rgba(30, 27, 75, 0.35);
+}
+
+/* ============================================================
+   ITEMS PAGE - SEARCH BAR
+============================================================ */
+
+.items-controls #itemSearch {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+
+    box-sizing: border-box;
+
+    padding: 0 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--bg);
+    color: var(--ink);
+
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+.items-controls #itemSearch::placeholder {
+    color: var(--ink-soft);
+    opacity: 1;
+}
+
+
+.items-controls #itemSearch:hover {
+    border-color: var(--ink);
+}
+
+
+.items-controls #itemSearch:focus {
+    border-color: var(--found);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 169, 165, 0.12);
+}
+
+.items-controls {
+    align-items: center;
+}
+
+.items-controls #itemSearch,
+.items-controls .custom-dropdown-button {
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+}
+
+/* Dropdowns */
+.items-controls select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    padding: 0 12px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    background: var(--bg);
+    color: var(--ink);
+
+    font-family: var(--font-body);
+    font-size: 13px;
+
+    outline: none;
+}
+
+/* Dropdown focus */
+.items-controls select:focus {
+    border-color: var(--found);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 169, 165, 0.12);
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+
+    .items-controls {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ============================================================
+   LOST & FOUND - SHARED DROPDOWN STYLE
+============================================================ */
+.lf-select {
+    width: 100%;
+    min-height: 44px;
+
+    padding: 0 42px 0 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background-color: var(--bg);
+    color: var(--ink);
+
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+
+    outline: none;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+        linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+
+    background-position:
+        calc(100% - 18px) 18px,
+        calc(100% - 12px) 18px;
+
+    background-size:
+        6px 6px,
+        6px 6px;
+
+    background-repeat: no-repeat;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.lf-select:hover {
+    border-color: var(--ink);
+}
+
+.lf-select:focus {
+    border-color: var(--found);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 169, 165, 0.12);
+}
+
+.lf-select option {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+/* ============================================================
+   CUSTOM CATEGORY DROPDOWN
+============================================================ */
+
+/* Hide the real HTML select.
+   It remains in the form so Flask still receives the value. */
+.real-category-select {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    opacity: 0 !important;
+
+    pointer-events: none !important;
+}
+
+/* Main dropdown */
+.custom-dropdown {
+    position: relative;
+
+    width: 100%;
+    max-width: 500px;
+
+    margin-top: 8px;
+}
+
+/* Dropdown button */
+.custom-dropdown-button {
+    width: 100%;
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 15px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--bg);
+    color: var(--ink);
+
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.custom-dropdown-button:hover {
+    border-color: var(--ink);
+}
+
+.custom-dropdown.open
+.custom-dropdown-button {
+    border-color: var(--found);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 169, 165, 0.12);
+}
+
+/* Arrow */
+.custom-dropdown-arrow {
+    font-size: 16px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+.custom-dropdown.open
+.custom-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.custom-dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 7px);
+    left: 0;
+    right: 0;
+
+    z-index: 1000;
+
+    display: none;
+
+    padding: 6px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    box-shadow:
+        0 14px 30px -12px rgba(30, 27, 75, 0.35);
+}
+
+.custom-dropdown.open
+.custom-dropdown-menu {
+    display: block;
+}
+
+/* Options */
+.custom-dropdown-option {
+    padding: 11px 12px;
+
+    border-radius: 8px;
+
+    color: var(--ink);
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.custom-dropdown-option:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+/* Selected option */
+.custom-dropdown-option.selected {
+    background: var(--ink);
+    color: #ffffff;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .custom-dropdown {
+        max-width: 100%;
+    }
+
+}
+
+/* ============================================================
+   ITEMS CUSTOM DROPDOWNS
+============================================================ */
+.items-real-select {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    opacity: 0 !important;
+
+    pointer-events: none !important;
+}
+
+.items-custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.items-custom-dropdown .custom-dropdown-button {
+    width: 100%;
 }

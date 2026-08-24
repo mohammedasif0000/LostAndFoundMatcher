@@ -126,7 +126,7 @@
             <div class="dashboard-stat-card">
 
                 <span class="dashboard-stat-number">
-                    0
+                    {{ returned_items }}
                 </span>
 
                 <span class="dashboard-stat-label">
@@ -321,6 +321,14 @@
 
         </section>
 
+        <!-- ================= VIEW ALL ITEMS ================= -->
+        <div class="view-all-items">
+
+            <a href="{{ url_for('items') }}" class="view-all-items-button">
+                View All Reported Items →
+            </a>
+
+        </div>
 
     </main>
 

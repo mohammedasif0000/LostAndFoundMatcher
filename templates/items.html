@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>All Reported Items | LOST & FOUND</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="site-header">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="brand"
+        >
+
+            <span class="brand-mark">
+                L&F
+            </span>
+
+            <span class="brand-name">
+                LOST & FOUND
+            </span>
+
+        </a>
+
+
+        <nav class="main-nav">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a
+                href="{{ url_for('items') }}"
+                class="active"
+            >
+                All Items
+            </a>
+
+            <a href="{{ url_for('report_lost') }}">
+                Report Lost
+            </a>
+
+            <a href="{{ url_for('report_found') }}">
+                Report Found
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="items-main">
+
+
+        <!-- ================= PAGE HEADER ================= -->
+
+        <section class="items-header">
+
+            <p class="items-eyebrow">
+                LOST & FOUND
+            </p>
+
+            <h1>
+                All Reported Items
+            </h1>
+
+            <p>
+                Browse and search through all lost and found reports.
+            </p>
+
+        </section>
+
+
+
+        <!-- ================= SEARCH / FILTER ================= -->
+
+        <section class="items-controls">
+
+
+            <!-- Search -->
+
+            <input
+                type="text"
+                id="itemSearch"
+                placeholder="Search by item, category, location..."
+                autocomplete="off"
+            >
+
+
+            <!-- Type -->
+
+            <select
+                id="typeFilter"
+                class="items-real-select"
+            >
+                <option value="all">All Items</option>
+                <option value="lost">Lost Items</option>
+                <option value="found">Found Items</option>
+            </select>
+
+            <div
+                class="custom-dropdown items-custom-dropdown"
+                id="typeDropdown"
+            >
+
+                <button
+                    type="button"
+                    class="custom-dropdown-button"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                >
+
+                    <span class="custom-dropdown-text">
+                        All Items
+                    </span>
+
+                    <span class="custom-dropdown-arrow">
+                        ▾
+                    </span>
+
+                </button>
+
+
+                <div
+                    class="custom-dropdown-menu"
+                    role="listbox"
+                >
+
+                    <div
+                        class="custom-dropdown-option selected"
+                        data-value="all"
+                        role="option"
+                    >
+                        All Items
+                    </div>
+
+                    <div
+                        class="custom-dropdown-option"
+                        data-value="lost"
+                        role="option"
+                    >
+                        Lost Items
+                    </div>
+
+                    <div
+                        class="custom-dropdown-option"
+                        data-value="found"
+                        role="option"
+                    >
+                        Found Items
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Category -->
+
+            <select
+                id="categoryFilter"
+                class="items-real-select"
+            >
+
+                <option value="all">
+                    All Categories
+                </option>
+
+                {% set categories = [] %}
+
+                {% for item in items %}
+
+                    {% if item['category'] and item['category'] not in categories %}
+
+                        {% set _ = categories.append(item['category']) %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% for category in categories|sort %}
+
+                    <option value="{{ category|lower }}">
+                        {{ category|capitalize }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+            
+            <div
+                class="custom-dropdown items-custom-dropdown"
+                id="categoryDropdown"
+            >
+
+                <button
+                    type="button"
+                    class="custom-dropdown-button"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                >
+
+                    <span class="custom-dropdown-text">
+                        All Categories
+                    </span>
+
+                    <span class="custom-dropdown-arrow">
+                        ▾
+                    </span>
+
+                </button>
+
+
+                <div
+                    class="custom-dropdown-menu"
+                    role="listbox"
+                >
+
+                    <div
+                        class="custom-dropdown-option selected"
+                        data-value="all"
+                        role="option"
+                    >
+                        All Categories
+                    </div>
+
+
+                    {% for category in categories|sort %}
+
+                        <div
+                            class="custom-dropdown-option"
+                            data-value="{{ category|lower }}"
+                            role="option"
+                        >
+                            {{ category|capitalize }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= RESULT COUNT ================= -->
+
+        <div class="items-result-info">
+
+            <span id="resultCount">
+                {{ items|length }} items
+            </span>
+
+        </div>
+
+
+
+        <!-- ================= ITEMS GRID ================= -->
+
+        <section
+            class="items-grid"
+            id="itemsGrid"
+        >
+
+            {% if items %}
+
+
+                {% for item in items %}
+
+                    <a
+                        href="{{ url_for('item_details', item_id=item['id'], from='items') }}"
+                        class="item-card"
+
+                        data-type="{{ item['type']|lower }}"
+
+                        data-category="{{ item['category']|lower }}"
+
+                        data-search="
+                            {{ item['item_name'] }}
+                            {{ item['category'] }}
+                            {{ item['location'] }}
+                            {{ item['description'] }}
+                        "
+                    >
+
+
+                        <!-- IMAGE -->
+
+                        {% if item['image'] %}
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='uploads/' + item['image']
+                                ) }}"
+                                alt="{{ item['item_name'] }}"
+                                class="item-card-image"
+                            >
+
+                        {% else %}
+
+                            <div class="item-card-no-image">
+
+                                No Image
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- CONTENT -->
+
+                        <div class="item-card-content">
+
+
+                            <!-- TYPE -->
+
+                            <span
+                                class="item-card-type {{ item['type']|lower }}"
+                            >
+                                {{ item['type']|upper }}
+                            </span>
+
+
+                            <!-- NAME -->
+
+                            <h2>
+                                {{ item['item_name'] }}
+                            </h2>
+
+
+                            <!-- CATEGORY -->
+
+                            <p>
+                                <strong>Category:</strong>
+                                {{ item['category']|capitalize }}
+                            </p>
+
+
+                            <!-- LOCATION -->
+
+                            <p>
+                                <strong>Location:</strong>
+                                {{ item['location'] }}
+                            </p>
+
+
+                            <!-- DATE -->
+
+                            <p>
+                                <strong>Date:</strong>
+                                {{ item['date'] }}
+                            </p>
+
+
+                        </div>
+
+                    </a>
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="items-empty">
+
+                    <h2>
+                        No items reported yet
+                    </h2>
+
+                    <p>
+                        Lost and found reports will appear here.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- ================= NO RESULTS ================= -->
+
+        <div
+            id="noResults"
+            class="items-empty"
+            style="display: none;"
+        >
+
+            <h2>
+                No matching items
+            </h2>
+
+            <p>
+                Try changing your search or filters.
+            </p>
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        const searchInput =
+            document.getElementById("itemSearch");
+
+        const typeFilter =
+            document.getElementById("typeFilter");
+
+        const categoryFilter =
+            document.getElementById("categoryFilter");
+
+        const itemCards =
+            document.querySelectorAll(".item-card");
+
+        const noResults =
+            document.getElementById("noResults");
+
+        const resultCount =
+            document.getElementById("resultCount");
+
+
+
+        function filterItems() {
+
+            const searchText =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+
+            const selectedType =
+                typeFilter.value
+                    .toLowerCase();
+
+
+            const selectedCategory =
+                categoryFilter.value
+                    .toLowerCase();
+
+
+            let visibleCount = 0;
+
+
+
+            itemCards.forEach(card => {
+
+
+                const cardType =
+                    card.dataset.type
+                        .toLowerCase();
+
+
+                const cardCategory =
+                    card.dataset.category
+                        .toLowerCase();
+
+
+                const searchData =
+                    card.dataset.search
+                        .toLowerCase();
+
+
+                const matchesSearch =
+                    searchData.includes(searchText);
+
+
+                const matchesType =
+                    selectedType === "all" ||
+                    cardType === selectedType;
+
+
+                const matchesCategory =
+                    selectedCategory === "all" ||
+                    cardCategory === selectedCategory;
+
+
+
+                if (
+                    matchesSearch &&
+                    matchesType &&
+                    matchesCategory
+                ) {
+
+                    card.style.display = "";
+
+                    visibleCount++;
+
+                } else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+
+
+            /* RESULT COUNT */
+
+            if (visibleCount === 1) {
+
+                resultCount.textContent =
+                    "1 item";
+
+            } else {
+
+                resultCount.textContent =
+                    visibleCount + " items";
+
+            }
+
+
+
+            /* NO RESULTS */
+
+            if (visibleCount === 0) {
+
+                noResults.style.display =
+                    "block";
+
+            } else {
+
+                noResults.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+
+        /* SEARCH */
+
+        searchInput.addEventListener(
+            "input",
+            filterItems
+        );
+
+
+        /* TYPE FILTER */
+
+        typeFilter.addEventListener(
+            "change",
+            filterItems
+        );
+
+
+        /* CATEGORY FILTER */
+
+        categoryFilter.addEventListener(
+            "change",
+            filterItems
+        );
+
+        /* ============================================================
+            CUSTOM ITEMS DROPDOWNS
+        ============================================================ */
+
+        function setupItemsDropdown(dropdownId, selectElement) {
+
+            const dropdown =
+                document.getElementById(dropdownId);
+
+            const button =
+                dropdown.querySelector(
+                    ".custom-dropdown-button"
+                );
+
+            const text =
+                dropdown.querySelector(
+                    ".custom-dropdown-text"
+                );
+
+            const options =
+                dropdown.querySelectorAll(
+                    ".custom-dropdown-option"
+                );
+
+
+            /* Open / close */
+
+            button.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    document
+                        .querySelectorAll(
+                            ".items-custom-dropdown.open"
+                        )
+                        .forEach(
+                            function (otherDropdown) {
+
+                                if (otherDropdown !== dropdown) {
+
+                                    otherDropdown.classList.remove(
+                                        "open"
+                                    );
+
+                                    otherDropdown
+                                        .querySelector(
+                                            ".custom-dropdown-button"
+                                        )
+                                        .setAttribute(
+                                            "aria-expanded",
+                                            "false"
+                                        );
+
+                                }
+
+                            }
+                        );
+
+
+                    dropdown.classList.toggle("open");
+
+
+                    button.setAttribute(
+                        "aria-expanded",
+                        dropdown.classList.contains("open")
+                    );
+
+                }
+            );
+
+
+            /* Select */
+
+            options.forEach(
+                function (option) {
+
+                    option.addEventListener(
+                        "click",
+                        function () {
+
+                            const value =
+                                option.dataset.value;
+
+                            const label =
+                                option.textContent.trim();
+
+
+                            /* Update real select */
+
+                            selectElement.value =
+                                value;
+
+
+                            /* Update visible text */
+
+                            text.textContent =
+                                label;
+
+
+                            /* Selected state */
+
+                            options.forEach(
+                                function (item) {
+
+                                    item.classList.remove(
+                                        "selected"
+                                    );
+
+                                }
+                            );
+
+
+                            option.classList.add(
+                                "selected"
+                            );
+
+
+                            /* Close */
+
+                            dropdown.classList.remove(
+                                "open"
+                            );
+
+                            button.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+
+                            /* Run existing filtering */
+
+                            filterItems();
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* Initialize Type dropdown */
+
+        setupItemsDropdown(
+            "typeDropdown",
+            typeFilter
+        );
+
+
+        /* Initialize Category dropdown */
+
+        setupItemsDropdown(
+            "categoryDropdown",
+            categoryFilter
+        );
+
+
+        /* Close dropdowns when clicking outside */
+
+        document.addEventListener(
+            "click",
+            function () {
+
+                document
+                    .querySelectorAll(
+                        ".items-custom-dropdown.open"
+                    )
+                    .forEach(
+                        function (dropdown) {
+
+                            dropdown.classList.remove(
+                                "open"
+                            );
+
+                            dropdown
+                                .querySelector(
+                                    ".custom-dropdown-button"
+                                )
+                                .setAttribute(
+                                    "aria-expanded",
+                                    "false"
+                                );
+
+                        }
+                    );
+
+            }
+        );
+
+        /* INITIAL FILTER */
+
+        filterItems();
+
+    </script>
+
+
+</body>
+
+</html>

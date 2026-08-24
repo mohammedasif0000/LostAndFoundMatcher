@@ -5,6 +5,8 @@ import re
 import os
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+from difflib import SequenceMatcher
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "lost_and_found_dev_key"
@@ -16,21 +18,39 @@ def home():
 
 @app.route("/report_lost", methods=["GET", "POST"])
 def report_lost():
+
     if request.method == "POST":
+
         item_name = request.form.get("item_name")
         category = request.form.get("category")
         date = request.form.get("date")
         location = request.form.get("location")
         description = request.form.get("description")
         contact = request.form.get("contact")
-        identifying_feature = request.form.get("identifying_feature", "TEST")
+
+        identifying_feature = request.form.get(
+            "identifying_feature",
+            "TEST"
+        )
+
         secret_detail = request.form.get("secret_detail")
+
         photo = request.files.get("photos")
         image_filename = None
+
         if photo and photo.filename:
+
             filename = secure_filename(photo.filename)
+
             image_filename = filename
-            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+            photo.save(
+                os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    filename
+                )
+            )
+
         item_id = add_item(
             "lost",
             item_name,
@@ -43,28 +63,50 @@ def report_lost():
             identifying_feature,
             secret_detail
         )
+
         print("New Lost Item ID:", item_id)
         print("LOST ITEM SAVED TO DATABASE")
+
+        # Go to dashboard after successful submission
+        return redirect(url_for("dashboard"))
+
     return render_template("report_lost.html")
 
 @app.route("/report_found", methods=["GET", "POST"])
 def report_found():
+
     if request.method == "POST":
+
         item_name = request.form.get("item_name")
         category = request.form.get("category")
         date = request.form.get("date")
         location = request.form.get("location")
         description = request.form.get("description")
         contact = request.form.get("contact")
-        identifying_feature = request.form.get("identifying_feature")
+
+        identifying_feature = request.form.get(
+            "identifying_feature"
+        )
+
         secret_detail = request.form.get("secret_detail")
+
         photo = request.files.get("photos")
         image_filename = None
+
         if photo and photo.filename:
+
             filename = secure_filename(photo.filename)
+
             image_filename = filename
-            photo.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        add_item(
+
+            photo.save(
+                os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    filename
+                )
+            )
+
+        item_id = add_item(
             "found",
             item_name,
             category,
@@ -76,85 +118,525 @@ def report_found():
             identifying_feature,
             secret_detail
         )
+
+        print("New Found Item ID:", item_id)
         print("FOUND ITEM SAVED TO DATABASE")
+
+        # Go to dashboard after successful submission
+        return redirect(url_for("dashboard"))
+
     return render_template("report_found.html")
-            
+
+# ============================================================
+# MATCHING SYSTEM
+# ============================================================
+
+def text_similarity(text1, text2):
+    """
+    Compare two pieces of text and return a score from 0 to 100.
+    """
+
+    text1 = (text1 or "").strip().lower()
+    text2 = (text2 or "").strip().lower()
+
+    if not text1 or not text2:
+        return 0
+
+    return round(
+        SequenceMatcher(None, text1, text2).ratio() * 100
+    )
+
+def calculate_match_score(lost_item, found_item):
+    """
+    Calculate a match score between a lost item and a found item.
+    Maximum score = 100.
+    """
+
+    # Item name - 35 points
+    name_similarity = text_similarity(
+        lost_item["item_name"],
+        found_item["item_name"]
+    )
+
+    name_score = name_similarity * 0.35
+
+
+    # Description - 25 points
+    description_similarity = text_similarity(
+        lost_item["description"],
+        found_item["description"]
+    )
+
+    description_score = description_similarity * 0.25
+
+
+    # Category - 15 points
+    lost_category = (
+        lost_item["category"] or ""
+    ).strip().lower()
+
+    found_category = (
+        found_item["category"] or ""
+    ).strip().lower()
+
+    if lost_category and found_category:
+
+        if lost_category == found_category:
+            category_score = 15
+        else:
+            category_score = (
+                text_similarity(
+                    lost_category,
+                    found_category
+                ) * 0.15
+            )
+
+    else:
+        category_score = 0
+
+
+    # Location - 15 points
+    location_similarity = text_similarity(
+        lost_item["location"],
+        found_item["location"]
+    )
+
+    location_score = location_similarity * 0.15
+
+
+    # Date - 10 points
+    date_score = 0
+
+    try:
+
+        lost_date = datetime.strptime(
+            lost_item["date"],
+            "%Y-%m-%d"
+        )
+
+        found_date = datetime.strptime(
+            found_item["date"],
+            "%Y-%m-%d"
+        )
+
+        difference = abs(
+            (lost_date - found_date).days
+        )
+
+        if difference == 0:
+            date_score = 10
+
+        elif difference <= 1:
+            date_score = 9
+
+        elif difference <= 3:
+            date_score = 7
+
+        elif difference <= 7:
+            date_score = 5
+
+        elif difference <= 14:
+            date_score = 3
+
+        else:
+            date_score = 0
+
+    except (ValueError, TypeError):
+
+        date_score = 0
+
+
+    # Final score
+    total_score = (
+        name_score
+        + description_score
+        + category_score
+        + location_score
+        + date_score
+    )
+
+    return round(min(total_score, 100))
+
+def calculate_match_score(lost_item, found_item):
+    """
+    Calculate a simple matching score between a lost item
+    and a found item.
+
+    Maximum score: 100
+    """
+
+    score = 0
+
+    # --------------------------------------------------------
+    # CATEGORY MATCH - 30 POINTS
+    # --------------------------------------------------------
+
+    if (
+        lost_item["category"]
+        and found_item["category"]
+        and lost_item["category"].strip().lower()
+        == found_item["category"].strip().lower()
+    ):
+        score += 30
+
+
+    # --------------------------------------------------------
+    # ITEM NAME MATCH - 20 POINTS
+    # --------------------------------------------------------
+
+    lost_name = (lost_item["item_name"] or "").strip().lower()
+    found_name = (found_item["item_name"] or "").strip().lower()
+
+    if lost_name and found_name:
+
+        if lost_name == found_name:
+            score += 20
+
+        elif (
+            lost_name in found_name
+            or found_name in lost_name
+        ):
+            score += 10
+
+
+    # --------------------------------------------------------
+    # LOCATION MATCH - 20 POINTS
+    # --------------------------------------------------------
+
+    lost_location = (lost_item["location"] or "").strip().lower()
+    found_location = (found_item["location"] or "").strip().lower()
+
+    if lost_location and found_location:
+
+        if lost_location == found_location:
+            score += 20
+
+        elif (
+            lost_location in found_location
+            or found_location in lost_location
+        ):
+            score += 10
+
+
+    # --------------------------------------------------------
+    # DESCRIPTION SIMILARITY - 20 POINTS
+    # --------------------------------------------------------
+
+    lost_description = (
+        lost_item["description"] or ""
+    ).strip().lower()
+
+    found_description = (
+        found_item["description"] or ""
+    ).strip().lower()
+
+    if lost_description and found_description:
+
+        lost_words = set(lost_description.split())
+        found_words = set(found_description.split())
+
+        common_words = lost_words.intersection(found_words)
+
+        if common_words:
+
+            similarity = (
+                len(common_words)
+                / max(len(lost_words), len(found_words))
+            )
+
+            if similarity >= 0.5:
+                score += 20
+
+            elif similarity >= 0.25:
+                score += 10
+
+
+    # --------------------------------------------------------
+    # DATE MATCH - 10 POINTS
+    # --------------------------------------------------------
+
+    if (
+        lost_item["date"]
+        and found_item["date"]
+        and lost_item["date"] == found_item["date"]
+    ):
+        score += 10
+
+
+    return score
+
 @app.route("/match_result")
 def match_result():
-     match_score = 92
-     lost_item = "Black Wallet"
-     found_item = "Black Wallet"
-     lost_category = "Electronics"
-     found_category = "Electronics"
-     lost_location = "College Campus"
-     found_location = "College Campus"
-     lost_date = "08 August 2026"
-     found_date = "07 August 2026"
-     lost_image = "images/test-lost.jpg"
-     found_image = "images/test-found.jpg"
-     return render_template("match_result.html",match_score=match_score,lost_item=lost_item,found_item=found_item,lost_category=lost_category,found_category=found_category,lost_location=lost_location,found_location=found_location,lost_date=lost_date,found_date=found_date,lost_image=lost_image,found_image=found_image)
+
+    # --------------------------------------------------------
+    # LOGIN PROTECTION
+    # --------------------------------------------------------
+
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        return redirect(url_for("login"))
+
+
+    # --------------------------------------------------------
+    # GET LOST ITEM ID
+    # --------------------------------------------------------
+
+    lost_id = request.args.get("lost_id", type=int)
+
+    if lost_id is None:
+        return "Lost item ID is required.", 400
+
+
+    # --------------------------------------------------------
+    # GET ITEMS FROM DATABASE
+    # --------------------------------------------------------
+
+    connection = get_db_connection()
+
+    lost_item = connection.execute(
+        "SELECT * FROM items WHERE id = ? AND type = 'lost'",
+        (lost_id,)
+    ).fetchone()
+
+    found_items = connection.execute(
+        "SELECT * FROM items WHERE type = 'found'"
+    ).fetchall()
+
+    connection.close()
+
+
+    # --------------------------------------------------------
+    # LOST ITEM NOT FOUND
+    # --------------------------------------------------------
+
+    if lost_item is None:
+        return "Lost item not found.", 404
+
+
+    # --------------------------------------------------------
+    # CALCULATE MATCHES
+    # --------------------------------------------------------
+
+    matches = []
+
+    for found_item in found_items:
+
+        score = calculate_match_score(
+            lost_item,
+            found_item
+        )
+
+        matches.append({
+            "item": found_item,
+            "score": score
+        })
+
+
+    # --------------------------------------------------------
+    # SORT HIGHEST SCORE FIRST
+    # --------------------------------------------------------
+
+    matches.sort(
+        key=lambda match: match["score"],
+        reverse=True
+    )
+
+
+    # --------------------------------------------------------
+    # ONLY SHOW MEANINGFUL MATCHES
+    # --------------------------------------------------------
+
+    matches = [
+        match
+        for match in matches
+        if match["score"] >= 30
+    ]
+
+    return render_template("match_result.html", lost_item=lost_item, matches=matches)
 
 @app.route("/verification", methods=["GET", "POST"])
 def verification():
-    if request.method == "POST":
-        item_id = request.args.get("item_id")
-        print("Item ID:", item_id)
-        connection = get_db_connection()
-        item = connection.execute(
-            "SELECT * FROM Items WHERE id = ?",
-            (item_id,)
-        ).fetchone()
-        connection.close()
-        print("Original item:", item)
-        print("Identifying feature in DB:", item["identifying_feature"])
-        print("Secret Detail in DB:", item["secret_detail"])
-        identifying_feature = request.form["identifying_feature"]
-        secret_detail = request.form["secret_detail"]
-        location = request.form["location"]
-        date = request.form["date"]
-        description = request.form["description"]
-        print(identifying_feature)
-        print(secret_detail)   
-        print(location)
-        print(date)
-        print(description)
-        #SCORE SYSTEM
-        score = 0
-        if identifying_feature.lower().strip() == item["identifying_feature"].lower().strip():
-            score += 30
-        if secret_detail.strip().lower() == item["secret_detail"].strip().lower():
-            score += 25
-        if location.strip().lower() == item["location"].strip().lower():
-            score += 20
-        if date == item["date"]:
-            score += 15
-        if description.strip().lower() == item["description"].strip().lower():
-            score += 10
-        #VERIFICATION RESULT
-        if score >= 80:
-            status = "Verified"
-        elif score >= 60:
-            status = "Needs review"
-        else:
-            status = "Failed"
-        print("Verification Score:", score)
-        print("Verification Status:", status)
 
-        connection = get_db_connection()
-        connection.execute("""
-            INSERT INTO Verification (
-                item_id,
-                claimant_id,
-                identifying_feature,
-                secret_detail,
-                location,
-                date,
-                description,
-                score,
-                status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
+    # --------------------------------------------------------
+    # LOGIN PROTECTION
+    # --------------------------------------------------------
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+
+    # --------------------------------------------------------
+    # GET ITEM ID
+    # --------------------------------------------------------
+
+    # First try the URL:
+    # /verification?item_id=13
+    #
+    # If this is a POST, also allow the form to provide
+    # the item_id.
+
+    item_id = request.args.get("item_id", type=int)
+
+    if item_id is None and request.method == "POST":
+        item_id = request.form.get("item_id", type=int)
+
+
+    # --------------------------------------------------------
+    # ITEM ID REQUIRED
+    # --------------------------------------------------------
+
+    if item_id is None:
+        return "Verification item ID is required.", 400
+
+
+    # --------------------------------------------------------
+    # GET THE SELECTED FOUND ITEM
+    # --------------------------------------------------------
+
+    connection = get_db_connection()
+
+    item = connection.execute(
+        "SELECT * FROM items WHERE id = ?",
+        (item_id,)
+    ).fetchone()
+
+    connection.close()
+
+
+    # --------------------------------------------------------
+    # ITEM NOT FOUND
+    # --------------------------------------------------------
+
+    if item is None:
+        return "Item not found.", 404
+
+
+    # --------------------------------------------------------
+    # GET REQUEST
+    # --------------------------------------------------------
+
+    if request.method == "GET":
+
+        return render_template(
+            "verification.html",
+            item=item
+        )
+
+
+    # --------------------------------------------------------
+    # POST REQUEST
+    # --------------------------------------------------------
+
+    identifying_feature = request.form.get(
+        "identifying_feature",
+        ""
+    ).strip()
+
+    secret_detail = request.form.get(
+        "secret_detail",
+        ""
+    ).strip()
+
+    location = request.form.get(
+        "location",
+        ""
+    ).strip()
+
+    date = request.form.get(
+        "date",
+        ""
+    ).strip()
+
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
+
+
+    # --------------------------------------------------------
+    # SCORE SYSTEM
+    # --------------------------------------------------------
+
+    score = 0
+
+
+    if (
+        identifying_feature.lower()
+        == item["identifying_feature"].lower().strip()
+    ):
+        score += 30
+
+
+    if (
+        secret_detail.lower()
+        == item["secret_detail"].lower().strip()
+    ):
+        score += 25
+
+
+    if (
+        location.lower()
+        == item["location"].lower().strip()
+    ):
+        score += 20
+
+
+    if date == item["date"]:
+        score += 15
+
+
+    if (
+        description.lower()
+        == item["description"].lower().strip()
+    ):
+        score += 10
+
+
+    # --------------------------------------------------------
+    # VERIFICATION RESULT
+    # --------------------------------------------------------
+
+    if score >= 80:
+
+        status = "Verified"
+
+    elif score >= 60:
+
+        status = "Needs review"
+
+    else:
+
+        status = "Failed"
+
+
+    print("Verification Item ID:", item_id)
+    print("Verification Score:", score)
+    print("Verification Status:", status)
+
+
+    # --------------------------------------------------------
+    # SAVE VERIFICATION
+    # --------------------------------------------------------
+
+    connection = get_db_connection()
+
+    connection.execute(
+        """
+        INSERT INTO Verification (
+            item_id,
+            claimant_id,
+            identifying_feature,
+            secret_detail,
+            location,
+            date,
+            description,
+            score,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
             item_id,
             session["user_id"],
             identifying_feature,
@@ -164,14 +646,73 @@ def verification():
             description,
             score,
             status
-        ))
-        connection.commit()
+        )
+    )
+
+    connection.commit()
+    connection.close()
+
+
+    # --------------------------------------------------------
+    # SHOW RESULT
+    # --------------------------------------------------------
+
+    return render_template(
+        "verification.html",
+        item=item,
+        verification_submitted=True,
+        score=score,
+        status=status
+    )
+
+@app.route("/mark_returned/<int:item_id>", methods=["POST"])
+def mark_returned(item_id):
+
+    # Login protection
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+
+    # Check that the item exists
+    item = connection.execute(
+        "SELECT * FROM Items WHERE id = ?",
+        (item_id,)
+    ).fetchone()
+
+    if item is None:
         connection.close()
-    return render_template("verification.html")
+        return "Item not found.", 404
+
+    # Mark item as returned
+    connection.execute(
+        "UPDATE Items SET returned = 1 WHERE id = ?",
+        (item_id,)
+    )
+
+    connection.commit()
+    connection.close()
+
+    # Go back to the item's details page
+    return redirect(url_for("item_details", item_id=item_id))
 
 @app.route("/search")
 def search():
-     return render_template("search.html")
+    return render_template("search.html")
+
+@app.route("/items")
+def items():
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    all_items = get_items()
+
+    return render_template(
+        "items.html",
+        items=all_items
+    )
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -262,20 +803,26 @@ def forgot_password():
 @app.route("/item/<int:item_id>")
 def item_details(item_id):
     user_id = session.get("user_id")
+
     if user_id is None:
        return redirect(url_for("login"))
+    
     connection = get_db_connection()
     item = connection.execute(
         "SELECT * FROM items WHERE id = ?",
         (item_id,)
     ).fetchone()
     connection.close()
+
     if item is None:
         return "Item not found", 404
-    return render_template(
-        "item_details.html",
-        item=item
-    )
+
+    #REMEMBER WHERE THE USER CAME FROM
+    source = request.args.get("from", "dashboard")
+    if source not in ["dashboard", "items"]:
+        source = "dashboard"
+
+    return render_template("item_details.html", item=item, source=source)
 
 @app.route("/dashboard")
 def dashboard():
@@ -288,8 +835,21 @@ def dashboard():
     items = get_items()
 
     total_items = len(items)
-    found_items = sum(1 for item in items if item["type"] == "found")
-    lost_items = sum(1 for item in items if item["type"] == "lost")
+
+    found_items = sum(
+        1 for item in items
+        if item["type"] == "found"
+    )
+
+    lost_items = sum(
+        1 for item in items
+        if item["type"] == "lost"
+    )
+
+    returned_items = sum(
+        1 for item in items
+        if item["returned"] == 1
+    )
 
     return render_template(
         "dashboard.html",
@@ -297,7 +857,8 @@ def dashboard():
         items=items,
         total_items=total_items,
         found_items=found_items,
-        lost_items=lost_items
+        lost_items=lost_items,
+        returned_items=returned_items
     )
 
 if __name__ == "__main__":

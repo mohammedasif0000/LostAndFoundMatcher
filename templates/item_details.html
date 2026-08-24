@@ -88,6 +88,21 @@
                         {{ item['type']|upper }}
                     </span>
 
+                    {% if item['returned'] == 1 %}
+
+                        <span
+                            class="recent-item-type"
+                            style="
+                                background: #e8f8f0;
+                                color: #16834e;
+                                margin-left: 8px;
+                            "
+                        >
+                            RETURNED
+                        </span>
+
+                    {% endif %}
+
                     <h3>
                         {{ item['item_name'] }}
                     </h3>
@@ -140,12 +155,37 @@
 
         <section class="dashboard-section">
 
-            <a
-                href="{{ url_for('dashboard') }}"
-                class="btn-primary"
-            >
-                ← Back to Dashboard
-            </a>
+            {% if item['type'] == 'lost' %}
+
+                <a
+                    href="{{ url_for('match_result', lost_id=item['id']) }}"
+                    class="btn-primary"
+                >
+                    🔎 Find Possible Matches
+                </a>
+
+            {% endif %}
+
+
+            {% if source == "items" %}
+
+                <a
+                    href="{{ url_for('items') }}"
+                    class="btn-primary"
+                >
+                    ← Back to All Reported Items
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="btn-primary"
+                >
+                    ← Back to Dashboard
+                </a>
+
+            {% endif %}
 
         </section>
 
