@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, flash
 from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password, get_db_connection, get_user_by_id, get_items
 from werkzeug.security import generate_password_hash
 import re
@@ -14,10 +14,40 @@ app.config["UPLOAD_FOLDER"] = "static/uploads"
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    connection = get_db_connection()
+
+    total_items = connection.execute(
+        "SELECT COUNT(*) FROM Items"
+    ).fetchone()[0]
+
+    found_items = connection.execute(
+        "SELECT COUNT(*) FROM Items WHERE type = 'found'"
+    ).fetchone()[0]
+
+    returned_items = connection.execute(
+        "SELECT COUNT(*) FROM Items WHERE returned = 1"
+    ).fetchone()[0]
+
+    success_rate = (
+        round((returned_items / total_items) * 100)
+        if total_items > 0
+        else 0
+    )
+
+    connection.close()
+
+    return render_template(
+        "index.html",
+        total_items=total_items,
+        found_items=found_items,
+        returned_items=returned_items,
+        success_rate=success_rate
+    )
 
 @app.route("/report_lost", methods=["GET", "POST"])
 def report_lost():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
     if request.method == "POST":
 
@@ -66,6 +96,10 @@ def report_lost():
 
         print("New Lost Item ID:", item_id)
         print("LOST ITEM SAVED TO DATABASE")
+        flash(
+            "Your lost item has been reported successfully!",
+            "success"
+        )
 
         # Go to dashboard after successful submission
         return redirect(url_for("dashboard"))
@@ -74,6 +108,8 @@ def report_lost():
 
 @app.route("/report_found", methods=["GET", "POST"])
 def report_found():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
     if request.method == "POST":
 
@@ -121,6 +157,10 @@ def report_found():
 
         print("New Found Item ID:", item_id)
         print("FOUND ITEM SAVED TO DATABASE")
+        flash(
+            "Your found item has been reported successfully!",
+            "success"
+        )
 
         # Go to dashboard after successful submission
         return redirect(url_for("dashboard"))
@@ -695,10 +735,6 @@ def mark_returned(item_id):
 
     # Go back to the item's details page
     return redirect(url_for("item_details", item_id=item_id))
-
-@app.route("/search")
-def search():
-    return render_template("search.html")
 
 @app.route("/items")
 def items():

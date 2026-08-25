@@ -20,58 +20,27 @@
 </head>
 
 
-<body>
+<body class="items-page">
 
-    <!-- ================= HEADER ================= -->
-
-    <header class="site-header">
-
-        <a
-            href="{{ url_for('dashboard') }}"
-            class="brand"
-        >
-
-            <span class="brand-mark">
-                L&F
-            </span>
-
-            <span class="brand-name">
-                LOST & FOUND
-            </span>
-
-        </a>
-
-
-        <nav class="main-nav">
-
-            <a href="{{ url_for('dashboard') }}">
-                Dashboard
+    <!-- ================= SIDEBAR ================= -->
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+                <span class="sidebar-brand-mark">L&F</span>
+                <span><strong>LOST & FOUND</strong><small>Find. Report. Reunite.</small></span>
             </a>
-
-            <a
-                href="{{ url_for('items') }}"
-                class="active"
-            >
-                All Items
-            </a>
-
-            <a href="{{ url_for('report_lost') }}">
-                Report Lost
-            </a>
-
-            <a href="{{ url_for('report_found') }}">
-                Report Found
-            </a>
-
-            <a href="{{ url_for('logout') }}">
-                Logout
-            </a>
-
-        </nav>
-
-    </header>
-
-
+            <nav class="sidebar-nav">
+                <p class="sidebar-label">MENU</p>
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link"><span class="sidebar-icon">⌂</span><span>Dashboard</span></a>
+                <a href="{{ url_for('items') }}" class="sidebar-link active"><span class="sidebar-icon">▦</span><span>All Reported Items</span></a>
+                <a href="{{ url_for('report_lost') }}" class="sidebar-link"><span class="sidebar-icon">−</span><span>Report Lost</span></a>
+                <a href="{{ url_for('report_found') }}" class="sidebar-link"><span class="sidebar-icon">+</span><span>Report Found</span></a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="sidebar-help"><span class="help-icon">?</span><div><strong>Need help?</strong><small>Find your lost item faster.</small></div></div>
+                <a href="{{ url_for('logout') }}" class="sidebar-logout">Logout</a>
+            </div>
+        </aside>
 
     <!-- ================= MAIN ================= -->
 
@@ -296,14 +265,24 @@
 
                 {% for item in items %}
 
-                    <a
-                        href="{{ url_for('item_details', item_id=item['id'], from='items') }}"
+                    <div
                         class="item-card"
+                        tabindex="0"
 
+                        data-id="{{ item['id'] }}"
                         data-type="{{ item['type']|lower }}"
-
                         data-category="{{ item['category']|lower }}"
 
+                        data-name="{{ item['item_name']|e }}"
+                        data-location="{{ item['location']|e }}"
+                        data-date="{{ item['date']|e }}"
+                        data-description="{{ item['description']|e }}"
+                        data-contact="{{ item['contact']|e }}"
+
+                        data-image="{% if item['image'] %}{{ url_for('static', filename='uploads/' + item['image']) }}{% endif %}"
+
+                        data-returned="{{ item['returned'] }}"
+                        
                         data-search="
                             {{ item['item_name'] }}
                             {{ item['category'] }}
@@ -311,7 +290,6 @@
                             {{ item['description'] }}
                         "
                     >
-
 
                         <!-- IMAGE -->
 
@@ -385,7 +363,7 @@
 
                         </div>
 
-                    </a>
+                    </div>
 
                 {% endfor %}
 
@@ -430,6 +408,169 @@
 
         </div>
 
+        <!-- =========================================================
+     ITEM DETAILS MODAL
+========================================================= -->
+
+<div
+    class="item-modal"
+    id="itemModal"
+    aria-hidden="true"
+>
+
+    <div class="item-modal-overlay" id="itemModalOverlay"></div>
+
+    <div
+        class="item-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalItemName"
+    >
+
+        <button
+            type="button"
+            class="item-modal-close"
+            id="itemModalClose"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+
+        <div class="item-modal-image-wrap">
+
+            <img
+                id="modalItemImage"
+                class="item-modal-image"
+                src=""
+                alt=""
+            >
+
+            <div
+                id="modalNoImage"
+                class="item-modal-no-image"
+            >
+                No Image
+            </div>
+
+        </div>
+
+
+        <div class="item-modal-content">
+
+            <div class="item-modal-badges">
+
+                <span
+                    id="modalItemType"
+                    class="item-modal-badge"
+                >
+                </span>
+
+                <span
+                    id="modalReturned"
+                    class="item-modal-badge returned"
+                >
+                    RETURNED
+                </span>
+
+            </div>
+
+
+            <h2 id="modalItemName">
+                Item Name
+            </h2>
+
+
+            <div class="item-modal-details">
+
+                <div>
+                    <span>Category</span>
+                    <strong id="modalCategory"></strong>
+                </div>
+
+                <div>
+                    <span>Location</span>
+                    <strong id="modalLocation"></strong>
+                </div>
+
+                <div>
+                    <span>Date</span>
+                    <strong id="modalDate"></strong>
+                </div>
+
+            </div>
+
+
+            <div class="item-modal-section">
+
+                <span>
+                    Description
+                </span>
+
+                <p id="modalDescription"></p>
+
+            </div>
+
+
+            <div class="item-modal-section">
+
+                <span>
+                    Contact
+                </span>
+
+                <p id="modalContact"></p>
+
+            </div>
+
+
+            <div class="item-modal-verification">
+
+                <div class="verification-icon">
+                    🔒
+                </div>
+
+                <div>
+
+                    <strong>
+                        Verification Required
+                    </strong>
+
+                    <p>
+                        If you believe this item belongs to you,
+                        verification may be required before claiming it.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="item-modal-actions">
+
+                <a
+                    id="modalMatchButton"
+                    class="modal-match-button"
+                    href="#"
+                    style="display: none;"
+                >
+                    🔎 Find Possible Matches
+                </a>
+
+                <button
+                    type="button"
+                    class="btn-primary"
+                    id="modalCloseButton"
+                >
+                    Close
+                </button>
+
+            </div>
+            
+
+        </div>
+
+    </div>
+
+</div>
 
     </main>
 
@@ -787,9 +928,300 @@
 
         filterItems();
 
+
+        /* ============================================================
+        ITEM DETAILS MODAL
+        ============================================================ */
+
+        const itemModal =
+            document.getElementById("itemModal");
+
+        const itemModalOverlay =
+            document.getElementById("itemModalOverlay");
+
+        const itemModalClose =
+            document.getElementById("itemModalClose");
+
+        const modalCloseButton =
+            document.getElementById("modalCloseButton");
+
+        const modalMatchButton =
+            document.getElementById("modalMatchButton");
+
+
+        const modalItemImage =
+            document.getElementById("modalItemImage");
+
+        const modalNoImage =
+            document.getElementById("modalNoImage");
+
+        const modalItemType =
+            document.getElementById("modalItemType");
+
+        const modalReturned =
+            document.getElementById("modalReturned");
+
+        const modalItemName =
+            document.getElementById("modalItemName");
+
+        const modalCategory =
+            document.getElementById("modalCategory");
+
+        const modalLocation =
+            document.getElementById("modalLocation");
+
+        const modalDate =
+            document.getElementById("modalDate");
+
+        const modalDescription =
+            document.getElementById("modalDescription");
+
+        const modalContact =
+            document.getElementById("modalContact");
+
+
+        /* OPEN MODAL */
+
+        function openItemModal(card) {
+
+            const itemId =
+                card.dataset.id;
+
+            const itemType =
+                card.dataset.type.toLowerCase();
+
+            const itemName =
+                card.dataset.name;
+
+            const itemCategory =
+                card.dataset.category;
+
+            const itemLocation =
+                card.dataset.location;
+
+            const itemDate =
+                card.dataset.date;
+
+            const itemDescription =
+                card.dataset.description;
+
+            const itemContact =
+                card.dataset.contact;
+
+            const itemImage =
+                card.dataset.image;
+
+            const returned =
+                card.dataset.returned;
+
+
+            /* BASIC DETAILS */
+
+            modalItemName.textContent =
+                itemName;
+
+            modalCategory.textContent =
+                itemCategory;
+
+            modalLocation.textContent =
+                itemLocation;
+
+            modalDate.textContent =
+                itemDate;
+
+            modalDescription.textContent =
+                itemDescription || "No description provided.";
+
+            modalContact.textContent =
+                itemContact || "Not provided.";
+
+
+            /* TYPE */
+
+            modalItemType.textContent =
+                itemType.toUpperCase();
+
+            modalItemType.className =
+                "item-modal-badge " + itemType;
+
+
+            /* RETURNED */
+
+            if (returned === "1" || returned === "true") {
+
+                modalReturned.style.display =
+                    "inline-flex";
+
+            } else {
+
+                modalReturned.style.display =
+                    "none";
+
+            }
+
+
+            /* IMAGE */
+
+            if (itemImage) {
+
+                modalItemImage.src =
+                    itemImage;
+
+                modalItemImage.alt =
+                    itemName;
+
+                modalItemImage.style.display =
+                    "block";
+
+                modalNoImage.style.display =
+                    "none";
+
+            } else {
+
+                modalItemImage.src = "";
+
+                modalItemImage.style.display =
+                    "none";
+
+                modalNoImage.style.display =
+                    "flex";
+
+            }
+
+
+            /* MATCH BUTTON */
+
+            if (itemType === "lost") {
+
+                modalMatchButton.href =
+                    "{{ url_for('match_result', lost_id=0) }}"
+                        .replace(
+                            "0",
+                            itemId
+                        );
+
+                modalMatchButton.style.display =
+                    "inline-flex";
+
+            } else {
+
+                modalMatchButton.href =
+                    "#";
+
+                modalMatchButton.style.display =
+                    "none";
+
+            }
+
+
+            /* SHOW MODAL */
+
+            itemModal.classList.add("open");
+
+            itemModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.style.overflow =
+                "hidden";
+        }
+
+
+        /* CLOSE MODAL */
+
+        function closeItemModal() {
+
+            itemModal.classList.remove("open");
+
+            itemModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.style.overflow =
+                "";
+        }
+
+
+        /* CLICK ITEM */
+
+        itemCards.forEach(function(card) {
+
+            card.addEventListener(
+                "click",
+                function() {
+
+                    openItemModal(card);
+
+                }
+            );
+
+
+            card.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                    ) {
+
+                        event.preventDefault();
+
+                        openItemModal(card);
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        /* CLOSE BUTTONS */
+
+        itemModalClose.addEventListener(
+            "click",
+            closeItemModal
+        );
+
+        modalCloseButton.addEventListener(
+            "click",
+            closeItemModal
+        );
+
+        itemModalOverlay.addEventListener(
+            "click",
+            closeItemModal
+        );
+
+
+        /* ESCAPE KEY */
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Escape" &&
+                    itemModal.classList.contains("open")
+                ) {
+
+                    closeItemModal();
+
+                }
+
+            }
+        );
+
     </script>
 
+    <script
+    src="{{ url_for('static', filename='js/script.js') }}"
+    ></script>
 
+    </div>
 </body>
 
 </html>

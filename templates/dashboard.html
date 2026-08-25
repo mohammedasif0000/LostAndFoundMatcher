@@ -22,326 +22,881 @@
 </head>
 
 <body class="dashboard-page">
-
-    <!-- ================= HEADER ================= -->
-    <header class="site-header">
-
-        <a href="{{ url_for('dashboard') }}" class="brand">
-
-            <span class="brand-mark">L&F</span>
-
-            <span class="brand-name">
-                LOST & FOUND
-            </span>
-
-        </a>
-
-        <nav class="main-nav">
-
-            <a href="{{ url_for('dashboard') }}" class="active">
-                Dashboard
-            </a>
-
-            <a href="{{ url_for('report_lost') }}">
-                Report Lost
-            </a>
-
-            <a href="{{ url_for('report_found') }}">
-                Report Found
-            </a>
-
-            <a href="{{ url_for('logout') }}">
-                Logout
-            </a>
-
-        </nav>
-
-    </header>
-
-
-    <!-- ================= MAIN ================= -->
-    <main class="dashboard-main">
-
-
-        <!-- Welcome -->
-        <section class="welcome-banner anim-fadeUp">
-
-            <p class="dashboard-eyebrow">
-                YOUR DASHBOARD
-            </p>
-
-            <h1>
-                Welcome to LOST & FOUND
-            </h1>
-
-            <p>
-                Manage your lost and found activity from one place.
-            </p>
-
-        </section>
-
-
-        <!-- ================= STATS ================= -->
-        <section class="dashboard-stats anim-fadeUp">
-
-            <div class="dashboard-stat-card">
-
-                <span class="dashboard-stat-number">
-                    {{ total_items }}
-                </span>
-
-                <span class="dashboard-stat-label">
-                    Items Reported
-                </span>
-
-            </div>
-
-
-            <div class="dashboard-stat-card">
-
-                <span class="dashboard-stat-number">
-                    {{ lost_items }}
-                </span>
-
-                <span class="dashboard-stat-label">
-                    Items Lost
-                </span>
-
-            </div>
-
-
-            <div class="dashboard-stat-card">
-
-                <span class="dashboard-stat-number">
-                    {{ found_items }}
-                </span>
-
-                <span class="dashboard-stat-label">
-                    Items Found
-                </span>
-
-            </div>
-
-
-            <div class="dashboard-stat-card">
-
-                <span class="dashboard-stat-number">
-                    {{ returned_items }}
-                </span>
-
-                <span class="dashboard-stat-label">
-                    Items Returned
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= QUICK ACTIONS ================= -->
-        <section class="dashboard-section anim-fadeUp">
-
-            <h2 class="dashboard-section-title">
-                QUICK ACTIONS
-            </h2>
-
-
-            <div class="dashboard-actions">
-
-                <a
-                    href="{{ url_for('report_lost') }}"
-                    class="dashboard-action lost-action"
-                >
-
-                    <span class="action-label">
-                        LOST
-                    </span>
-
-                    <h3>
-                        Report a Lost Item
-                    </h3>
-
-                    <p>
-                        Tell us what you lost so we can help find a match.
-                    </p>
-
-                    <span class="action-arrow">
-                        →
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="{{ url_for('report_found') }}"
-                    class="dashboard-action found-action"
-                >
-
-                    <span class="action-label">
-                        FOUND
-                    </span>
-
-                    <h3>
-                        Report a Found Item
-                    </h3>
-
-                    <p>
-                        Tell us about an item you found and help return it.
-                    </p>
-
-                    <span class="action-arrow">
-                        →
-                    </span>
-
-                </a>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= PUZZLE MATCHING ================= -->
-        <section class="dashboard-section anim-fadeUp">
-
-            <h2 class="dashboard-section-title">
-                THE MATCH
-            </h2>
-
-            <p class="dashboard-section-description">
-                Lost and found items come together through matching.
-            </p>
-
-
-            <div class="puzzle-pair">
-
-                <div class="puzzle-half lost">
-
-                    <span class="puzzle-tag">
-                        LOST
-                    </span>
-
-                    <h3 class="puzzle-title">
-                        Something is missing
-                    </h3>
-
-                    <p class="puzzle-sub">
-                        Report your lost item and give it a chance to be found.
-                    </p>
-
-                </div>
-
-
-                <div class="puzzle-half found">
-
-                    <span class="puzzle-tag">
-                        FOUND
-                    </span>
-
-                    <h3 class="puzzle-title">
-                        Something was found
-                    </h3>
-
-                    <p class="puzzle-sub">
-                        Report a found item and help reconnect it with its owner.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= RECENT ACTIVITY ================= -->
-        <section class="dashboard-section anim-fadeUp">
-
-            <h2 class="dashboard-section-title">
-                RECENT ACTIVITY
-            </h2>
-
-
-            <div class="recent-items">
-
-                {% if items %}
-
-                    {% for item in items[-5:]|reverse %}
-
-                        <a
-                            href="{{ url_for('item_details', item_id=item['id']) }}"
-                            class="recent-item"
-                        >
-
-                            <div class="recent-item-info">
-
-                                <span class="recent-item-type {{ item['type'] }}">
-                                    {{ item['type']|upper }}
-                                </span>
-
-                                <h3>
-                                    {{ item['item_name'] }}
-                                </h3>
-
-                                <p>
-                                    {{ item['category']|capitalize }}
-                                    · {{ item['location'] }}
-                                    · {{ item['date'] }}
-                                </p>
+    <!-- =========================================================
+        SUCCESS CONFIRMATION POPUP
+    ========================================================= -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                {% if category == "success" %}
+
+                    <div
+                        class="success-modal"
+                        id="successModal"
+                    >
+
+                        <div
+                            class="success-modal-overlay"
+                            onclick="closeSuccessModal()"
+                        ></div>
+
+                        <div class="success-modal-box">
+
+                            <button
+                                type="button"
+                                class="success-modal-close"
+                                onclick="closeSuccessModal()"
+                            >
+                                ×
+                            </button>
+
+                            <div class="success-icon">
+                                ✓
+                            </div>
+
+                            <span class="success-label">
+                                SUCCESS
+                            </span>
+
+                            <h2>
+                                Report Submitted!
+                            </h2>
+
+                            <p>
+                                {{ message }}
+                            </p>
+
+                            <div class="success-actions">
+
+                                <button
+                                    type="button"
+                                    class="success-ok-button"
+                                    onclick="closeSuccessModal()"
+                                >
+                                    OK
+                                </button>
+
+                                <a
+                                    href="{{ url_for('dashboard') }}"
+                                    class="success-dashboard-button"
+                                >
+                                    Back to Dashboard
+                                </a>
 
                             </div>
 
-                            <div class="recent-item-arrow">
-                                →
-                            </div>
-
-                        </a>
-
-                    {% endfor %}
-
-                {% else %}
-
-                    <div class="empty-activity">
-
-                        <div class="empty-icon">
-                            +
                         </div>
-
-                        <h3>
-                            No activity yet
-                        </h3>
-
-                        <p>
-                            Your reported items and activity will appear here.
-                        </p>
 
                     </div>
 
                 {% endif %}
 
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+    <div class="dashboard-layout">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="dashboard-sidebar">
+
+            <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+                <span class="sidebar-brand-mark">L&F</span>
+
+                <span>
+                    <strong>LOST & FOUND</strong>
+                    <small>Find. Report. Reunite.</small>
+                </span>
+            </a>
+
+            <nav class="sidebar-nav">
+
+                <p class="sidebar-label">MENU</p>
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="sidebar-link active"
+                >
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    href="{{ url_for('items') }}"
+                    class="sidebar-link"
+                >
+                    <span class="sidebar-icon">▦</span>
+                    <span>All Reported Items</span>
+                </a>
+
+                <a
+                    href="{{ url_for('report_lost') }}"
+                    class="sidebar-link"
+                >
+                    <span class="sidebar-icon">−</span>
+                    <span>Report Lost</span>
+                </a>
+
+                <a
+                    href="{{ url_for('report_found') }}"
+                    class="sidebar-link"
+                >
+                    <span class="sidebar-icon">+</span>
+                    <span>Report Found</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <button 
+                    type="button"
+                    class="sidebar-help"
+                    id="helpButton"
+                    aria-label="Open help">
+
+                    <span class="help-icon">?</span>
+
+                    <div>
+                        <strong>Need help?</strong>
+                        <small>Find your lost item faster.</small>
+                    </div>
+
+                </button>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="sidebar-logout"
+                >
+                    Logout
+                </a>
+
             </div>
 
-        </section>
+        </aside>
 
-        <!-- ================= VIEW ALL ITEMS ================= -->
-        <div class="view-all-items">
 
-            <a href="{{ url_for('items') }}" class="view-all-items-button">
-                View All Reported Items →
-            </a>
+        <!-- ================= DASHBOARD CONTENT ================= -->
+        <main class="dashboard-content">
+
+            <!-- TOP BAR -->
+            <header class="dashboard-topbar">
+
+                <div>
+                    <p class="dashboard-eyebrow">
+                        YOUR DASHBOARD
+                    </p>
+
+                    <h1>
+                        Welcome back!
+                    </h1>
+
+                    <p class="dashboard-subtitle">
+                        Manage your lost and found activity from one place.
+                    </p>
+                </div>
+
+                <button type="button"
+                        class="dashboard-user dashboard-user-button"
+                        id="accountBtn"
+                        aria-label="Open account menu">
+
+                    <div class="dashboard-user-avatar">
+                        {{ session.get('username', 'U')[0]|upper }}
+                    </div>
+
+                    <div class="dashboard-user-info">
+                        <strong>
+                            {{ session.get('username', 'User') }}
+                        </strong>
+
+                        <span>
+                            Account ▾
+                        </span>
+                    </div>
+
+                </button>
+
+            </header>
+
+
+            <!-- ================= STATS ================= -->
+            <section class="dashboard-stats anim-fadeUp">
+
+                <div class="dashboard-stat-card total-stat">
+
+                    <div class="stat-card-top">
+                        <span class="stat-card-icon">▦</span>
+                    </div>
+
+                    <span class="dashboard-stat-number">
+                        {{ total_items }}
+                    </span>
+
+                    <span class="dashboard-stat-label">
+                        Total Items
+                    </span>
+
+                    <p class="stat-card-description">
+                        All reported items
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-stat-card lost-stat">
+
+                    <div class="stat-card-top">
+                        <span class="stat-card-icon">−</span>
+                    </div>
+
+                    <span class="dashboard-stat-number">
+                        {{ lost_items }}
+                    </span>
+
+                    <span class="dashboard-stat-label">
+                        Items Lost
+                    </span>
+
+                    <p class="stat-card-description">
+                        Waiting to be found
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-stat-card found-stat">
+
+                    <div class="stat-card-top">
+                        <span class="stat-card-icon">+</span>
+                    </div>
+
+                    <span class="dashboard-stat-number">
+                        {{ found_items }}
+                    </span>
+
+                    <span class="dashboard-stat-label">
+                        Items Found
+                    </span>
+
+                    <p class="stat-card-description">
+                        Reported as found
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-stat-card returned-stat">
+
+                    <div class="stat-card-top">
+                        <span class="stat-card-icon">✓</span>
+                    </div>
+
+                    <span class="dashboard-stat-number">
+                        {{ returned_items }}
+                    </span>
+
+                    <span class="dashboard-stat-label">
+                        Items Returned
+                    </span>
+
+                    <p class="stat-card-description">
+                        Successfully reunited
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= MAIN GRID ================= -->
+            <div class="dashboard-grid">
+
+
+                <!-- ================= RECENT ACTIVITY ================= -->
+                <section class="dashboard-card recent-activity-card anim-fadeUp">
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+                            <span class="dashboard-card-eyebrow">
+                                ACTIVITY
+                            </span>
+
+                            <h2>
+                                Recent Activity
+                            </h2>
+                        </div>
+
+                        <a
+                            href="{{ url_for('items') }}"
+                            class="card-header-link"
+                        >
+                            View all →
+                        </a>
+
+                    </div>
+
+
+                    <div class="recent-items">
+
+                        {% if items %}
+
+                            {% for item in items[-5:]|reverse %}
+
+                                <a
+                                    href="{{ url_for('item_details', item_id=item['id']) }}"
+                                    class="recent-item"
+                                >
+
+                                    <div class="recent-item-icon
+                                        {% if item['type'] == 'lost' %}
+                                            recent-lost
+                                        {% else %}
+                                            recent-found
+                                        {% endif %}
+                                    ">
+                                        {% if item['type'] == 'lost' %}
+                                            −
+                                        {% else %}
+                                            +
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="recent-item-info">
+
+                                        <div class="recent-item-title-row">
+
+                                            <h3>
+                                                {{ item['item_name'] }}
+                                            </h3>
+
+                                            <span class="recent-item-type {{ item['type'] }}">
+                                                {{ item['type']|upper }}
+                                            </span>
+
+                                        </div>
+
+                                        <p>
+                                            {{ item['category']|capitalize }}
+                                            ·
+                                            {{ item['location'] }}
+                                            ·
+                                            {{ item['date'] }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="recent-item-arrow">
+                                        →
+                                    </div>
+
+                                </a>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="empty-activity">
+
+                                <div class="empty-icon">
+                                    +
+                                </div>
+
+                                <h3>
+                                    No activity yet
+                                </h3>
+
+                                <p>
+                                    Your reported items and activity will appear here.
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= QUICK ACTIONS ================= -->
+                <section class="dashboard-card quick-actions-card anim-fadeUp">
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+                            <span class="dashboard-card-eyebrow">
+                                GET STARTED
+                            </span>
+
+                            <h2>
+                                Quick Actions
+                            </h2>
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+                        <a
+                            href="{{ url_for('report_lost') }}"
+                            class="quick-action lost-action"
+                        >
+
+                            <span class="quick-action-icon">
+                                −
+                            </span>
+
+                            <div>
+                                <strong>Report Lost Item</strong>
+
+                                <span>
+                                    Tell us what you lost.
+                                </span>
+                            </div>
+
+                            <span class="quick-action-arrow">
+                                →
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="{{ url_for('report_found') }}"
+                            class="quick-action found-action"
+                        >
+
+                            <span class="quick-action-icon">
+                                +
+                            </span>
+
+                            <div>
+                                <strong>Report Found Item</strong>
+
+                                <span>
+                                    Help return an item.
+                                </span>
+                            </div>
+
+                            <span class="quick-action-arrow">
+                                →
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="{{ url_for('items') }}"
+                            class="quick-action items-action"
+                        >
+
+                            <span class="quick-action-icon">
+                                ▦
+                            </span>
+
+                            <div>
+                                <strong>Browse Items</strong>
+
+                                <span>
+                                    Explore all reports.
+                                </span>
+                            </div>
+
+                            <span class="quick-action-arrow">
+                                →
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- ================= MATCH BANNER ================= -->
+            <section class="match-banner anim-fadeUp">
+
+                <div class="match-banner-content">
+
+                    <span class="match-banner-icon">
+                        ✦
+                    </span>
+
+                    <div>
+                        <span class="match-banner-label">
+                            SMART MATCHING
+                        </span>
+
+                        <h2>
+                            Lost and found items can be connected.
+                        </h2>
+
+                        <p>
+                            Our matching system compares reported items
+                            to identify possible matches.
+                        </p>
+                    </div>
+
+                </div>
+
+                <a
+                    href="{{ url_for('items') }}"
+                    class="match-banner-button"
+                >
+                    Explore Items →
+                </a>
+
+            </section>
+
+
+            <!-- ================= FOOTER ================= -->
+            <footer class="dashboard-footer">
+
+                <p>
+                    LOST & FOUND · Find. Report. Reunite.
+                </p>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+    <script>
+
+    function closeSuccessModal() {
+
+        const modal =
+            document.getElementById("successModal");
+
+        if (!modal) {
+            return;
+        }
+
+        modal.style.opacity = "0";
+
+        setTimeout(function () {
+
+            modal.remove();
+
+        }, 200);
+
+    }
+
+    </script>
+
+    <!-- =========================================================
+        ACCOUNT POPUP
+    ========================================================= -->
+
+    <div class="dashboard-modal" id="accountModal">
+
+        <div class="dashboard-modal-box">
+
+            <button class="dashboard-modal-close" type="button" data-close="accountModal">
+                ×
+            </button>
+
+            <div class="account-modal-header">
+
+                <div class="account-big-avatar">
+                    {{ session.get('username', 'U')[0]|upper }}
+                </div>
+
+                <div>
+                    <span class="modal-eyebrow">YOUR ACCOUNT</span>
+
+                    <h2>
+                        {{ session.get('username', 'User') }}
+                    </h2>
+
+                    <p>LOST & FOUND member</p>
+                </div>
+
+            </div>
+
+
+            <div class="account-status">
+                <span class="status-dot"></span>
+                Account Active
+            </div>
+
+
+            <div class="account-modal-stats">
+
+                <div class="account-mini-card">
+                    <span class="mini-icon total-mini">▦</span>
+                    <strong>{{ total_items }}</strong>
+                    <small>Total Items</small>
+                </div>
+
+                <div class="account-mini-card">
+                    <span class="mini-icon lost-mini">−</span>
+                    <strong>{{ lost_items }}</strong>
+                    <small>Lost</small>
+                </div>
+
+                <div class="account-mini-card">
+                    <span class="mini-icon found-mini">+</span>
+                    <strong>{{ found_items }}</strong>
+                    <small>Found</small>
+                </div>
+
+                <div class="account-mini-card">
+                    <span class="mini-icon returned-mini">✓</span>
+                    <strong>{{ returned_items }}</strong>
+                    <small>Returned</small>
+                </div>
+
+            </div>
+
+
+            <div class="account-modal-actions">
+
+                <a href="{{ url_for('items') }}" class="modal-secondary-btn">
+                    View My Activity
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="modal-logout-btn">
+                    Logout
+                </a>
+
+            </div>
 
         </div>
 
-    </main>
+    </div>
 
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="dashboard-footer">
+    <!-- =========================================================
+        HELP POPUP
+    ========================================================= -->
 
-        <p>
-            LOST & FOUND · Find. Report. Reunite.
-        </p>
+    <div class="dashboard-modal" id="helpModal">
 
-    </footer>
+        <div class="dashboard-modal-box help-modal-box">
+
+            <button class="dashboard-modal-close" type="button" data-close="helpModal">
+                ×
+            </button>
+
+            <div class="help-modal-heading">
+
+                <div class="help-big-icon">?</div>
+
+                <div>
+                    <span class="modal-eyebrow">HELP CENTER</span>
+
+                    <h2>How can we help?</h2>
+
+                    <p>Quick guide to using LOST & FOUND.</p>
+                </div>
+
+            </div>
 
 
+            <div class="help-guide">
+
+                <div class="help-guide-item">
+
+                    <span class="guide-number">01</span>
+
+                    <div>
+                        <strong>Lost something?</strong>
+                        <p>
+                            Use <b>Report Lost</b> and enter the item's details,
+                            location, date and description.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="help-guide-item">
+
+                    <span class="guide-number">02</span>
+
+                    <div>
+                        <strong>Found something?</strong>
+                        <p>
+                            Use <b>Report Found</b> to tell others about the
+                            item you discovered.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="help-guide-item">
+
+                    <span class="guide-number">03</span>
+
+                    <div>
+                        <strong>Check possible matches</strong>
+                        <p>
+                            Our matching system compares reported lost and
+                            found items to identify possible matches.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="help-guide-item">
+
+                    <span class="guide-number">04</span>
+
+                    <div>
+                        <strong>Verification matters</strong>
+                        <p>
+                            A possible match may require verification before
+                            an item can be claimed.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button class="help-done-btn" type="button" data-close="helpModal">
+                Got it — thanks!
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const accountBtn = document.getElementById("accountBtn");
+        const helpBtn = document.getElementById("helpButton");
+
+        const accountModal = document.getElementById("accountModal");
+        const helpModal = document.getElementById("helpModal");
+
+
+        function openModal(modal) {
+            if (!modal) return;
+
+            accountModal.classList.remove("show");
+            helpModal.classList.remove("show");
+
+            modal.classList.add("show");
+
+            document.body.style.overflow = "hidden";
+        }
+
+
+        function closeModal(modal) {
+            if (!modal) return;
+
+            modal.classList.remove("show");
+
+            // Restore scrolling only when neither popup is open
+            if (
+                (!accountModal || !accountModal.classList.contains("show")) &&
+                (!helpModal || !helpModal.classList.contains("show"))
+            ) {
+                document.body.style.overflow = "";
+            }
+        }
+
+
+        /* =========================
+        ACCOUNT
+        ========================= */
+
+        if (accountBtn && accountModal) {
+            accountBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                openModal(accountModal);
+            });
+        }
+
+
+        /* =========================
+        HELP
+        ========================= */
+
+        if (helpBtn && helpModal) {
+            helpBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                openModal(helpModal);
+            });
+        }
+
+
+        /* =========================
+        CLOSE BUTTONS
+        ========================= */
+
+        document.querySelectorAll("[data-close]").forEach(function (button) {
+
+            button.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const modalId = button.getAttribute("data-close");
+
+                closeModal(document.getElementById(modalId));
+            });
+
+        });
+
+
+        /* =========================
+        CLICK OUTSIDE
+        ========================= */
+
+        [accountModal, helpModal].forEach(function (modal) {
+
+            if (!modal) return;
+
+            modal.addEventListener("click", function (event) {
+
+                if (event.target === modal) {
+                    closeModal(modal);
+                }
+
+            });
+
+        });
+
+
+        /* =========================
+        ESCAPE KEY
+        ========================= */
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key === "Escape") {
+
+                closeModal(accountModal);
+                closeModal(helpModal);
+
+            }
+
+        });
+
+    });
+    </script>
 </body>
 </html>
