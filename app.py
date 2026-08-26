@@ -1019,6 +1019,10 @@ def dashboard():
     user_id = session.get("user_id")
     print("DASHBOARD USER ID:", user_id)
 
+    if user is None:
+        session.clear()
+        return redirect(url_for("login"))
+
     if user_id is None:
         return redirect(url_for("login"))
 
