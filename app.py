@@ -9,7 +9,7 @@ from difflib import SequenceMatcher
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "lost_and_found_dev_key"
+app.secret_key = os.environ.get("SECRET_KEY", "lost_and_found_dev_key")
 app.config["UPLOAD_FOLDER"] = "static/uploads"
 
 @app.route("/")
