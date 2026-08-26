@@ -1,5 +1,19 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
-from database.db import add_item, add_user, get_user_by_username, get_user_by_email, update_password, get_db_connection, get_user_by_id, get_items
+from database.db import (
+    add_item,
+    add_user,
+    get_user_by_username,
+    get_user_by_email,
+    update_password,
+    get_db_connection,
+    get_user_by_id,
+    get_items,
+    create_table,
+    create_users_table,
+    update_users_table,
+    update_items_table,
+    create_verification_table
+)
 from werkzeug.security import generate_password_hash
 import re
 import os
@@ -11,6 +25,12 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "lost_and_found_dev_key")
 app.config["UPLOAD_FOLDER"] = "static/uploads"
+# Initialize database tables
+create_table()
+create_users_table()
+update_users_table()
+update_items_table()
+create_verification_table()
 
 @app.route("/")
 def landing():
