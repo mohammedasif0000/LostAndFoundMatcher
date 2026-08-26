@@ -25,6 +25,8 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "lost_and_found_dev_key")
 app.config["UPLOAD_FOLDER"] = "static/uploads"
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
 # Initialize database tables
 create_table()
 create_users_table()
