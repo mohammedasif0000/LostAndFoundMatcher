@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOST AND FOUND</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        body {
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .transition {
+            text-align: center;
+            color: white;
+            animation: reveal 0.8s ease forwards;
+        }
+
+        .transition h1 {
+            font-size: clamp(32px, 6vw, 72px);
+            letter-spacing: 12px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .transition p {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .line {
+            width: 0;
+            height: 1px;
+            background: white;
+            margin: 22px auto;
+            animation: lineGrow 0.8s ease forwards;
+        }
+
+        body.leaving {
+            opacity: 0;
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes lineGrow {
+            from {
+                width: 0;
+            }
+            to {
+                width: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="transition">
+        <h1>LOST &amp; FOUND</h1>
+        <div class="line"></div>
+        <p>Find. Report. Reunite.</p>
+        <p>Connection Begins Here.</p>
+    </div>
+
+    <script>
+        setTimeout(() => {
+
+            document.body.classList.add("leaving");
+
+            setTimeout(() => {
+                window.location.href = "/home";
+            }, 800);
+
+        }, 1800);
+    </script>
+
+</body>
+</html>

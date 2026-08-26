@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#eef6ff" />
+  <title>LOST AND FOUND — We find. You reconnect.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}" />
+</head>
+<body>
+  <main class="landing" id="landing">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="ambient ambient-c"></div>
+    <div class="grain"></div>
+
+    <section class="hero-card" aria-label="Lost and Found introduction">
+      <div class="halo"></div>
+      <div class="eyebrow"><span></span> LOST THING MUST RETURN HOME <span></span></div>
+      <h1><span>LOST</span><small>&AMP;</small><strong>FOUND</strong></h1>
+      <div class="divider"><i></i><b></b><i></i></div>
+      <p class="tagline"><span class="pin">⌖</span> We find. You reconnect.</p>
+      <div class="status-row">
+        <div class="status-dot"></div>
+        <span>Preparing your experience</span>
+        <strong id="counter">05</strong>
+      </div>
+    </section>
+
+    <div class="floaters" id="floaters" aria-hidden="true">
+      <img class="floater f1" src="{{ url_for('static', filename='images/landing/headphones.png') }}" alt="">
+      <img class="floater f2" src="{{ url_for('static', filename='images/landing/earbuds.png') }}" alt="">
+      <img class="floater f3" src="{{ url_for('static', filename='images/landing/watch.png') }}" alt="">
+      <img class="floater f4" src="{{ url_for('static', filename='images/landing/pen.png') }}" alt="">
+      <img class="floater f5" src="{{ url_for('static', filename='images/landing/folder.png') }}" alt="">
+      <img class="floater f6" src="{{ url_for('static', filename='images/landing/id-card.png') }}" alt="">
+      <img class="floater f7" src="{{ url_for('static', filename='images/landing/power-bank.png') }}" alt="">
+      <img class="floater f8" src="{{ url_for('static', filename='images/landing/glasses.png') }}" alt="">
+      <img class="floater f9" src="{{ url_for('static', filename='images/landing/laptop.png') }}" alt="">
+      <img class="floater f10" src="{{ url_for('static', filename='images/landing/usb.png') }}" alt="">
+      <img class="floater f11" src="{{ url_for('static', filename='images/landing/phone.png') }}" alt="">
+      <img class="floater f12" src="{{ url_for('static', filename='images/landing/keys.png') }}" alt="">
+      <img class="floater f13" src="{{ url_for('static', filename='images/landing/umbrella.png') }}" alt="">
+      <img class="floater f14" src="{{ url_for('static', filename='images/landing/backpack.png') }}" alt="">
+      <img class="floater f15" src="{{ url_for('static', filename='images/landing/bottle.png') }}" alt="">
+      <img class="floater f16" src="{{ url_for('static', filename='images/landing/wallet.png') }}" alt="">
+      <img class="floater f17" src="{{ url_for('static', filename='images/landing/notebook.png') }}" alt="">
+    </div>
+
+    <div class="micro-copy">Lost something? &nbsp;•&nbsp; Found something? &nbsp;•&nbsp; We connect the two.</div>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+  
+</body>
+</html>

@@ -7512,3 +7512,98 @@ body.match-page .dashboard-section {
         grid-template-columns: 100px 1fr;
     }
 }
+
+/* =========================================================
+   FLASH MESSAGE POPUPS
+========================================================= */
+
+.flash-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    width: min(380px, calc(100% - 32px));
+}
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 16px;
+    margin-bottom: 12px;
+
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    box-shadow: 0 15px 40px rgba(30, 27, 75, 0.18);
+
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+
+    animation: flashIn 0.35s ease forwards;
+}
+
+.flash-message.error {
+    border-left: 4px solid var(--lost);
+}
+
+.flash-message.success {
+    border-left: 4px solid var(--found);
+}
+
+.flash-icon {
+    width: 28px;
+    height: 28px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.flash-message.error .flash-icon {
+    background: var(--lost-soft);
+    color: var(--lost);
+}
+
+.flash-message.success .flash-icon {
+    background: var(--found-soft);
+    color: var(--found);
+}
+
+.flash-message button {
+    margin-left: auto;
+
+    border: none;
+    background: transparent;
+
+    color: var(--ink-soft);
+
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.flash-message button:hover {
+    color: var(--ink);
+}
+
+@keyframes flashIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

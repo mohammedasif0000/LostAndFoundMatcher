@@ -13,6 +13,14 @@ app.secret_key = "lost_and_found_dev_key"
 app.config["UPLOAD_FOLDER"] = "static/uploads"
 
 @app.route("/")
+def landing():
+    return render_template("landing.html")
+
+@app.route("/black")
+def black_page():
+    return render_template("black.html")
+
+@app.route("/home")
 def home():
     connection = get_db_connection()
 
@@ -755,59 +763,86 @@ def items():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+
         name = request.form.get("name", "").strip()
         if not name:
-            return "Please enter your full name"
+            flash("Please enter your full name.", "error")
+            return redirect(url_for("signup"))
+
         username = request.form.get("username", "").strip()
         if not re.fullmatch(r"[A-Za-z0-9_]{3,20}", username):
-            return "Username must be 3-20 characters and contain only letters, numbers, or _"
-        
+            flash(
+                "Username must be 3–20 characters and contain only letters, numbers, or _.",
+                "error"
+            )
+            return redirect(url_for("signup"))
+
         email = request.form.get("email", "").strip()
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
-            return "Please enter a valid email address"
+            flash("Please enter a valid email address.", "error")
+            return redirect(url_for("signup"))
 
-        password = request.form.get("password")
+        password = request.form.get("password", "")
+
         if len(password) < 8:
-            return "Password must be at least 8 characters long"
+            flash("Password must be at least 8 characters long.", "error")
+            return redirect(url_for("signup"))
 
         if not re.search(r"[A-Z]", password):
-            return "Password must contain an uppercase letter"
+            flash("Password must contain an uppercase letter.", "error")
+            return redirect(url_for("signup"))
 
         if not re.search(r"[a-z]", password):
-            return "Password must contain a lowercase letter"
+            flash("Password must contain a lowercase letter.", "error")
+            return redirect(url_for("signup"))
 
         if not re.search(r"\d", password):
-            return "Password must contain a number"
+            flash("Password must contain a number.", "error")
+            return redirect(url_for("signup"))
 
         if not re.search(r"[!@#$%^&*]", password):
-            return "Password must contain a special character"
-        
-        confirm_password = request.form.get("confirm_password")
+            flash("Password must contain a special character.", "error")
+            return redirect(url_for("signup"))
+
+        confirm_password = request.form.get("confirm_password", "")
+
         if password != confirm_password:
-            return "Passwords do not match"
-        
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("signup"))
+
         password_hash = generate_password_hash(password)
 
         if not add_user(name, username, email, password_hash):
-            return "Username or email already exists"
+            flash("Username or email already exists.", "error")
+            return redirect(url_for("signup"))
 
+        flash("Account created successfully! Please log in.", "success")
         return redirect(url_for("login"))
+
     return render_template("signup.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+
         username = request.form.get("username", "").strip()
-        password = request.form.get("password")
+        password = request.form.get("password", "")
+
         user = get_user_by_username(username)
 
         if user is None:
-            return "Invalid username or password"
-        
+            flash("Invalid username or password.", "error")
+            return redirect(url_for("login"))
+
         if not check_password_hash(user["password_hash"], password):
-            return "Invalid username or password"
+            flash("Invalid username or password.", "error")
+            return redirect(url_for("login"))
+
         session["user_id"] = user["id"]
+
+        flash("Login successful!", "success")
         return redirect(url_for("dashboard"))
+
     return render_template("login.html")
 
 @app.route("/logout")
@@ -825,35 +860,40 @@ def change_password():
 
     if request.method == "POST":
 
-        current_password = request.form.get("current_password")
-        new_password = request.form.get("new_password")
-        confirm_password = request.form.get("confirm_password")
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
 
-        # Check current password
         if not check_password_hash(
             user["password_hash"],
             current_password
         ):
-            return "Current password is incorrect"
+            flash("Current password is incorrect.", "error")
+            return redirect(url_for("change_password"))
 
-        # Check new password
         if new_password != confirm_password:
-            return "New passwords do not match"
+            flash("New passwords do not match.", "error")
+            return redirect(url_for("change_password"))
 
         if len(new_password) < 8:
-            return "Password must be at least 8 characters long"
+            flash("Password must be at least 8 characters long.", "error")
+            return redirect(url_for("change_password"))
 
         if not re.search(r"[A-Z]", new_password):
-            return "Password must contain an uppercase letter"
+            flash("Password must contain an uppercase letter.", "error")
+            return redirect(url_for("change_password"))
 
         if not re.search(r"[a-z]", new_password):
-            return "Password must contain a lowercase letter"
+            flash("Password must contain a lowercase letter.", "error")
+            return redirect(url_for("change_password"))
 
         if not re.search(r"\d", new_password):
-            return "Password must contain a number"
+            flash("Password must contain a number.", "error")
+            return redirect(url_for("change_password"))
 
         if not re.search(r"[!@#$%^&*]", new_password):
-            return "Password must contain a special character"
+            flash("Password must contain a special character.", "error")
+            return redirect(url_for("change_password"))
 
         new_password_hash = generate_password_hash(new_password)
 
@@ -871,6 +911,7 @@ def change_password():
         connection.commit()
         connection.close()
 
+        flash("Password changed successfully!", "success")
         return redirect(url_for("dashboard"))
 
     return render_template(
@@ -880,28 +921,50 @@ def change_password():
 
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
+
     if request.method == "POST":
+
         email = request.form.get("email", "").strip()
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
         user = get_user_by_email(email)
+
         if user is None:
-            return "No account found with this email"
+            flash("No account found with this email.", "error")
+            return redirect(url_for("forgot_password"))
+
         if password != confirm_password:
-            return "Passwords do not match"
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("forgot_password"))
+
         if len(password) < 8:
-            return "Password must be at least 8 characters long"
+            flash("Password must be at least 8 characters long.", "error")
+            return redirect(url_for("forgot_password"))
+
         if not re.search(r"[A-Z]", password):
-            return "Password must contain an uppercase letter"
+            flash("Password must contain an uppercase letter.", "error")
+            return redirect(url_for("forgot_password"))
+
         if not re.search(r"[a-z]", password):
-            return "Password must contain a lowercase letter"
+            flash("Password must contain a lowercase letter.", "error")
+            return redirect(url_for("forgot_password"))
+
         if not re.search(r"\d", password):
-            return "Password must contain a number"
+            flash("Password must contain a number.", "error")
+            return redirect(url_for("forgot_password"))
+
         if not re.search(r"[!@#$%^&*]", password):
-            return "Password must contain a special character"
+            flash("Password must contain a special character.", "error")
+            return redirect(url_for("forgot_password"))
+
         password_hash = generate_password_hash(password)
+
         update_password(email, password_hash)
+
+        flash("Password reset successfully! Please log in.", "success")
         return redirect(url_for("login"))
+
     return render_template("forgot_password.html")
 
 @app.route("/item/<int:item_id>")
