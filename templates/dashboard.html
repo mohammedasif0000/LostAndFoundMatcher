@@ -208,12 +208,12 @@
                         aria-label="Open account menu">
 
                     <div class="dashboard-user-avatar">
-                        {{ session.get('username', 'U')[0]|upper }}
+                        {{ (user['name'] or user['username'])[0]|upper }}
                     </div>
 
                     <div class="dashboard-user-info">
-                        <strong>
-                            {{ session.get('username', 'User') }}
+                        <strong class="account-name">
+                            {{ user['name'] or user['username'] }}
                         </strong>
 
                         <span>
@@ -313,7 +313,119 @@
                 </div>
 
             </section>
+            
+            <!-- ================= MY REPORTS ================= -->
+            <section class="my-reports-section anim-fadeUp">
 
+                <div class="my-reports-header">
+
+                    <div>
+                        <span class="dashboard-card-eyebrow">
+                            YOUR ACTIVITY
+                        </span>
+
+                        <h2>My Reports</h2>
+
+                        <p>
+                            Reports you have submitted.
+                        </p>
+                    </div>
+
+                    <span class="my-reports-count">
+                        {{ my_total_items }} report{% if my_total_items != 1 %}s{% endif %}
+                    </span>
+
+                </div>
+
+
+                <div class="my-report-tiles">
+
+                    <!-- LOST TILE -->
+                    <button
+                        type="button"
+                        class="my-report-type-tile my-lost-tile"
+                        data-my-report-filter="lost"
+                    >
+
+                        <span class="my-report-tile-icon">−</span>
+
+                        <span class="my-report-tile-title">
+                            Lost Reports
+                        </span>
+
+                        <strong>
+                            {{ my_lost_items }}
+                        </strong>
+
+                        <span class="my-report-tile-text">
+                            Items you reported lost
+                        </span>
+
+                        <span class="my-report-tile-action">
+                            View reports →
+                        </span>
+
+                    </button>
+
+
+                    <!-- FOUND TILE -->
+                    <button
+                        type="button"
+                        class="my-report-type-tile my-found-tile"
+                        data-my-report-filter="found"
+                    >
+
+                        <span class="my-report-tile-icon">+</span>
+
+                        <span class="my-report-tile-title">
+                            Found Reports
+                        </span>
+
+                        <strong>
+                            {{ my_found_items }}
+                        </strong>
+
+                        <span class="my-report-tile-text">
+                            Items you reported found
+                        </span>
+
+                        <span class="my-report-tile-action">
+                            View reports →
+                        </span>
+
+                    </button>
+
+
+                    <!-- ALL TILE -->
+                    <button
+                        type="button"
+                        class="my-report-type-tile my-all-tile"
+                        data-my-report-filter="all"
+                    >
+
+                        <span class="my-report-tile-icon">▦</span>
+
+                        <span class="my-report-tile-title">
+                            All My Reports
+                        </span>
+
+                        <strong>
+                            {{ my_total_items }}
+                        </strong>
+
+                        <span class="my-report-tile-text">
+                            View everything you reported
+                        </span>
+
+                        <span class="my-report-tile-action">
+                            View reports →
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </section>
 
             <!-- ================= MAIN GRID ================= -->
             <div class="dashboard-grid">
@@ -346,13 +458,23 @@
 
                     <div class="recent-items">
 
-                        {% if items %}
+                        {% if my_items %}
 
-                            {% for item in items[-5:]|reverse %}
+                            {% for item in my_items %}
 
-                                <a
-                                    href="{{ url_for('item_details', item_id=item['id']) }}"
-                                    class="recent-item"
+                                <button
+                                    type="button"
+                                    class="recent-item recent-item-button"
+                                    data-item-id="{{ item['id'] }}"
+                                    data-item-name="{{ item['item_name'] }}"
+                                    data-item-type="{{ item['type'] }}"
+                                    data-item-category="{{ item['category'] }}"
+                                    data-item-location="{{ item['location'] }}"
+                                    data-item-date="{{ item['date'] }}"
+                                    data-item-description="{{ item['description'] }}"
+                                    data-item-contact="{{ item['contact'] }}"
+                                    data-item-image="{{ item['image'] or '' }}"
+                                    data-item-returned="{{ item['returned'] }}"
                                 >
 
                                     <div class="recent-item-icon
@@ -397,7 +519,7 @@
                                         →
                                     </div>
 
-                                </a>
+                                </button>
 
                             {% endfor %}
 
@@ -611,17 +733,17 @@
             <div class="account-modal-header">
 
                 <div class="account-big-avatar">
-                    {{ session.get('username', 'U')[0]|upper }}
+                    {{ (user['name'] or user['username'])[0]|upper }}
                 </div>
 
                 <div>
                     <span class="modal-eyebrow">YOUR ACCOUNT</span>
 
                     <h2>
-                        {{ session.get('username', 'User') }}
+                        {{ user['name'] or user['username'] }}
                     </h2>
 
-                    <p>LOST & FOUND member</p>
+                    <p>{{ user['username'] }} · LOST & FOUND member</p>
                 </div>
 
             </div>
@@ -661,13 +783,34 @@
 
             </div>
 
+            <div class="account-profile-details">
+
+                <div class="account-profile-row">
+                    <span>FULL NAME</span>
+                    <strong>{{ user['name'] or 'Not provided' }}</strong>
+                </div>
+
+                <div class="account-profile-row">
+                    <span>USERNAME</span>
+                    <strong>{{ user['username'] }}</strong>
+                </div>
+
+                <div class="account-profile-row">
+                    <span>EMAIL</span>
+                    <strong>{{ user['email'] }}</strong>
+                </div>
+
+            </div>
 
             <div class="account-modal-actions">
 
                 <a href="{{ url_for('items') }}" class="modal-secondary-btn">
                     View My Activity
                 </a>
-
+                <a href="{{ url_for('change_password') }}" class="account-menu-item">
+                    <span>🔑</span>
+                    <span>Change Password</span>
+                </a>
                 <a href="{{ url_for('logout') }}" class="modal-logout-btn">
                     Logout
                 </a>
@@ -773,6 +916,356 @@
             <button class="help-done-btn" type="button" data-close="helpModal">
                 Got it — thanks!
             </button>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================================
+        MY REPORTS POPUP
+    ========================================================= -->
+
+    <div class="dashboard-modal my-reports-modal" id="myReportsModal">
+
+        <div class="dashboard-modal-box my-reports-modal-box">
+
+            <button
+                class="dashboard-modal-close"
+                type="button"
+                data-close="myReportsModal"
+            >
+                ×
+            </button>
+
+
+            <div class="my-reports-modal-heading">
+
+                <div>
+                    <span class="modal-eyebrow">
+                        YOUR REPORTS
+                    </span>
+
+                    <h2 id="myReportsModalTitle">
+                        My Reports
+                    </h2>
+
+                    <p id="myReportsModalSubtitle">
+                        Items you have reported.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="my-reports-filter-row">
+
+                <button
+                    type="button"
+                    class="my-filter-btn active"
+                    data-my-filter="all"
+                >
+                    All
+                </button>
+
+                <button
+                    type="button"
+                    class="my-filter-btn"
+                    data-my-filter="lost"
+                >
+                    Lost
+                </button>
+
+                <button
+                    type="button"
+                    class="my-filter-btn"
+                    data-my-filter="found"
+                >
+                    Found
+                </button>
+
+            </div>
+
+
+            <div class="my-reports-modal-grid">
+
+                {% if my_items %}
+
+                    {% for item in my_items %}
+
+                        <article
+                            class="my-report-modal-card"
+                            data-report-type="{{ item['type'] }}"
+                        >
+
+                            <div class="my-report-modal-top">
+
+                                <span
+                                    class="my-report-status
+                                    {% if item['type'] == 'lost' %}
+                                        my-status-lost
+                                    {% else %}
+                                        my-status-found
+                                    {% endif %}"
+                                >
+                                    {% if item['type'] == 'lost' %}
+                                        LOST
+                                    {% else %}
+                                        FOUND
+                                    {% endif %}
+                                </span>
+
+                                <span class="my-report-id">
+                                    #{{ item['id'] }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="my-report-modal-icon
+                                {% if item['type'] == 'lost' %}
+                                    modal-lost-icon
+                                {% else %}
+                                    modal-found-icon
+                                {% endif %}
+                            ">
+                                {% if item['type'] == 'lost' %}
+                                    −
+                                {% else %}
+                                    +
+                                {% endif %}
+                            </div>
+
+
+                            <h3>
+                                {{ item['item_name'] }}
+                            </h3>
+
+
+                            <div class="my-report-modal-details">
+
+                                <span>
+                                    <b>Category</b>
+                                    {{ item['category'] or 'Not specified' }}
+                                </span>
+
+                                <span>
+                                    <b>Location</b>
+                                    {{ item['location'] or 'Not specified' }}
+                                </span>
+
+                                <span>
+                                    <b>Date</b>
+                                    {{ item['date'] or 'Not specified' }}
+                                </span>
+
+                            </div>
+
+
+                            <a
+                                href="{{ url_for('item_details', item_id=item['id'], source='dashboard') }}"
+                                class="my-report-view-button"
+                            >
+                                View Details →
+                            </a>
+
+                        </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="my-reports-empty">
+
+                        <div class="my-reports-empty-icon">
+                            +
+                        </div>
+
+                        <h3>
+                            No reports yet
+                        </h3>
+
+                        <p>
+                            Your lost and found reports will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================================
+        RECENT ACTIVITY ITEM DETAILS POPUP
+    ========================================================= -->
+
+    <div
+        class="item-modal"
+        id="dashboardItemModal"
+        aria-hidden="true"
+    >
+
+        <div
+            class="item-modal-overlay"
+            id="dashboardItemModalOverlay"
+        ></div>
+
+
+        <div class="item-modal-box">
+
+            <!-- IMAGE -->
+
+            <div class="item-modal-image-wrap">
+
+                <img
+                    id="dashboardItemImage"
+                    src=""
+                    alt=""
+                    style="display:none;"
+                >
+
+                <div
+                    id="dashboardItemNoImage"
+                    class="item-modal-no-image"
+                >
+                    No image available
+                </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div class="item-modal-content">
+
+                <div class="item-modal-top">
+
+                    <div>
+
+                        <span
+                            id="dashboardItemType"
+                            class="item-status-badge"
+                        >
+                            ITEM
+                        </span>
+
+                        <h2 id="dashboardItemName">
+                            Item
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="item-modal-close"
+                        id="dashboardItemClose"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="item-modal-details">
+
+                    <div class="item-modal-detail">
+
+                        <span class="item-modal-detail-label">
+                            Category
+                        </span>
+
+                        <span
+                            class="item-modal-detail-value"
+                            id="dashboardItemCategory"
+                        ></span>
+
+                    </div>
+
+
+                    <div class="item-modal-detail">
+
+                        <span class="item-modal-detail-label">
+                            Location
+                        </span>
+
+                        <span
+                            class="item-modal-detail-value"
+                            id="dashboardItemLocation"
+                        ></span>
+
+                    </div>
+
+
+                    <div class="item-modal-detail">
+
+                        <span class="item-modal-detail-label">
+                            Date
+                        </span>
+
+                        <span
+                            class="item-modal-detail-value"
+                            id="dashboardItemDate"
+                        ></span>
+
+                    </div>
+
+
+                    <div class="item-modal-detail">
+
+                        <span class="item-modal-detail-label">
+                            Description
+                        </span>
+
+                        <span
+                            class="item-modal-detail-value"
+                            id="dashboardItemDescription"
+                        ></span>
+
+                    </div>
+
+
+                    <div class="item-modal-detail">
+
+                        <span class="item-modal-detail-label">
+                            Contact
+                        </span>
+
+                        <span
+                            class="item-modal-detail-value"
+                            id="dashboardItemContact"
+                        ></span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="item-modal-actions">
+
+                    <a
+                        id="dashboardItemOpen"
+                        href="#"
+                        class="btn-primary"
+                    >
+                        Open Full Details →
+                    </a>
+
+                    <a
+                        id="dashboardItemMatch"
+                        href="#"
+                        class="modal-match-button"
+                        style="display:none;"
+                    >
+                        🔎 Find Possible Matches
+                    </a>
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -896,7 +1389,593 @@
 
         });
 
+        /* =====================================================
+           MY REPORTS
+        ===================================================== */
+
+        const myReportsModal =
+            document.getElementById("myReportsModal");
+
+        const myReportTiles =
+            document.querySelectorAll(
+                ".my-report-type-tile"
+            );
+
+        const myFilterButtons =
+            document.querySelectorAll(
+                ".my-filter-btn"
+            );
+
+        const myReportCards =
+            document.querySelectorAll(
+                ".my-report-modal-card"
+            );
+
+        const myReportsTitle =
+            document.getElementById(
+                "myReportsModalTitle"
+            );
+
+        const myReportsSubtitle =
+            document.getElementById(
+                "myReportsModalSubtitle"
+            );
+
+
+        function openMyReports(filter) {
+
+            if (!myReportsModal) return;
+
+
+            if (filter === "lost") {
+
+                myReportsTitle.textContent =
+                    "My Lost Reports";
+
+                myReportsSubtitle.textContent =
+                    "Items you have reported as lost.";
+
+            } else if (filter === "found") {
+
+                myReportsTitle.textContent =
+                    "My Found Reports";
+
+                myReportsSubtitle.textContent =
+                    "Items you have reported as found.";
+
+            } else {
+
+                myReportsTitle.textContent =
+                    "My Reports";
+
+                myReportsSubtitle.textContent =
+                    "All items you have reported.";
+
+            }
+
+
+            myReportCards.forEach(function (card) {
+
+                const type =
+                    card.dataset.reportType;
+
+                if (
+                    filter === "all" ||
+                    type === filter
+                ) {
+
+                    card.style.display = "";
+
+                } else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+
+            myFilterButtons.forEach(function (button) {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.myFilter === filter
+                );
+
+            });
+
+
+            myReportsModal.classList.add("show");
+
+            document.body.style.overflow = "hidden";
+
+        }
+
+
+        /* TILE CLICKS */
+
+        myReportTiles.forEach(function (tile) {
+
+            tile.addEventListener(
+                "click",
+                function (event) {
+
+                    event.preventDefault();
+
+                    openMyReports(
+                        tile.dataset.myReportFilter
+                    );
+
+                }
+            );
+
+        });
+
+
+        /* FILTER BUTTONS */
+
+        myFilterButtons.forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function (event) {
+
+                    event.preventDefault();
+
+                    openMyReports(
+                        button.dataset.myFilter
+                    );
+
+                }
+            );
+
+        });
+
+
+        /* CLOSE MY REPORTS */
+
+        if (myReportsModal) {
+
+            const closeMyReports =
+                myReportsModal.querySelector(
+                    "[data-close='myReportsModal']"
+                );
+
+            if (closeMyReports) {
+
+                closeMyReports.addEventListener(
+                    "click",
+                    function () {
+
+                        myReportsModal.classList.remove(
+                            "show"
+                        );
+
+                        document.body.style.overflow = "";
+
+                    }
+                );
+
+            }
+
+
+            myReportsModal.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target === myReportsModal
+                    ) {
+
+                        myReportsModal.classList.remove(
+                            "show"
+                        );
+
+                        document.body.style.overflow = "";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* ESCAPE */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    myReportsModal &&
+                    myReportsModal.classList.contains("show")
+                ) {
+
+                    myReportsModal.classList.remove(
+                        "show"
+                    );
+
+                    document.body.style.overflow = "";
+
+                }
+
+            }
+        );
+
     });
     </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const myReportsModal = document.getElementById("myReportsModal");
+
+        if (!myReportsModal) return;
+
+        const tiles = document.querySelectorAll(".my-report-type-tile");
+        const filters = document.querySelectorAll(".my-filter-btn");
+        const cards = document.querySelectorAll(".my-report-modal-card");
+
+        const title = document.getElementById("myReportsModalTitle");
+        const subtitle = document.getElementById("myReportsModalSubtitle");
+
+        const closeButton =
+            myReportsModal.querySelector(".dashboard-modal-close");
+
+
+        function showMyReports(filter) {
+
+            if (filter === "lost") {
+                title.textContent = "My Lost Reports";
+                subtitle.textContent = "Items you have reported as lost.";
+            }
+            else if (filter === "found") {
+                title.textContent = "My Found Reports";
+                subtitle.textContent = "Items you have reported as found.";
+            }
+            else {
+                title.textContent = "My Reports";
+                subtitle.textContent = "All items you have reported.";
+            }
+
+
+            cards.forEach(function (card) {
+
+                const type = card.dataset.reportType;
+
+                card.style.display =
+                    (filter === "all" || type === filter)
+                    ? ""
+                    : "none";
+
+            });
+
+
+            filters.forEach(function (button) {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.myFilter === filter
+                );
+
+            });
+
+
+            myReportsModal.classList.add("show");
+
+            document.body.style.overflow = "hidden";
+        }
+
+
+        /* TILE CLICK */
+
+        tiles.forEach(function (tile) {
+
+            tile.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                showMyReports(
+                    tile.dataset.myReportFilter
+                );
+
+            });
+
+        });
+
+
+        /* FILTER CLICK */
+
+        filters.forEach(function (button) {
+
+            button.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                showMyReports(
+                    button.dataset.myFilter
+                );
+
+            });
+
+        });
+
+
+        /* CLOSE BUTTON */
+
+        if (closeButton) {
+
+            closeButton.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                myReportsModal.classList.remove("show");
+
+                document.body.style.overflow = "";
+
+            });
+
+        }
+
+
+        /* CLICK ONLY ON BACKDROP */
+
+        myReportsModal.addEventListener("click", function (event) {
+
+            if (event.target === myReportsModal) {
+
+                myReportsModal.classList.remove("show");
+
+                document.body.style.overflow = "";
+
+            }
+
+        });
+
+
+        /* ESC */
+
+        document.addEventListener("keydown", function (event) {
+
+            if (
+                event.key === "Escape" &&
+                myReportsModal.classList.contains("show")
+            ) {
+
+                myReportsModal.classList.remove("show");
+
+                document.body.style.overflow = "";
+
+            }
+
+        });
+
+    });
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modal =
+            document.getElementById("dashboardItemModal");
+
+        const overlay =
+            document.getElementById("dashboardItemModalOverlay");
+
+        const closeButton =
+            document.getElementById("dashboardItemClose");
+
+        const image =
+            document.getElementById("dashboardItemImage");
+
+        const noImage =
+            document.getElementById("dashboardItemNoImage");
+
+        const name =
+            document.getElementById("dashboardItemName");
+
+        const type =
+            document.getElementById("dashboardItemType");
+
+        const category =
+            document.getElementById("dashboardItemCategory");
+
+        const location =
+            document.getElementById("dashboardItemLocation");
+
+        const date =
+            document.getElementById("dashboardItemDate");
+
+        const description =
+            document.getElementById("dashboardItemDescription");
+
+        const contact =
+            document.getElementById("dashboardItemContact");
+
+        const openFull =
+            document.getElementById("dashboardItemOpen");
+
+        const matchButton =
+            document.getElementById("dashboardItemMatch");
+
+
+        const recentItems =
+            document.querySelectorAll(
+                ".recent-item-button"
+            );
+
+
+        function closeItemModal() {
+
+            modal.classList.remove("open");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "modal-open"
+            );
+
+        }
+
+
+        recentItems.forEach(function (item) {
+
+            item.addEventListener(
+                "click",
+                function () {
+
+                    const itemId =
+                        item.dataset.itemId;
+
+                    const itemType =
+                        item.dataset.itemType;
+
+                    const itemImage =
+                        item.dataset.itemImage;
+
+
+                    name.textContent =
+                        item.dataset.itemName;
+
+                    category.textContent =
+                        item.dataset.itemCategory;
+
+                    location.textContent =
+                        item.dataset.itemLocation;
+
+                    date.textContent =
+                        item.dataset.itemDate;
+
+                    description.textContent =
+                        item.dataset.itemDescription;
+
+                    contact.textContent =
+                        item.dataset.itemContact;
+
+
+                    /* STATUS */
+
+                    type.textContent =
+                        itemType.toUpperCase();
+
+                    type.className =
+                        "item-status-badge " +
+                        itemType;
+
+
+                    /* IMAGE */
+
+                    if (itemImage) {
+
+                        image.src =
+                            "/static/uploads/" +
+                            itemImage;
+
+                        image.alt =
+                            item.dataset.itemName;
+
+                        image.style.display =
+                            "block";
+
+                        noImage.style.display =
+                            "none";
+
+                    } else {
+
+                        image.src = "";
+
+                        image.style.display =
+                            "none";
+
+                        noImage.style.display =
+                            "grid";
+
+                    }
+
+
+                    /* FULL DETAILS */
+
+                    openFull.href =
+                        "/item/" + itemId;
+
+
+                    /* MATCH BUTTON */
+
+                    if (itemType === "lost") {
+
+                        matchButton.href =
+                            "/match_result?lost_id=" +
+                            itemId;
+
+                        matchButton.style.display =
+                            "inline-flex";
+
+                    } else {
+
+                        matchButton.style.display =
+                            "none";
+
+                    }
+
+
+                    /* OPEN */
+
+                    modal.classList.add("open");
+
+                    modal.setAttribute(
+                        "aria-hidden",
+                        "false"
+                    );
+
+                    document.body.classList.add(
+                        "modal-open"
+                    );
+
+                }
+            );
+
+        });
+
+
+        closeButton.addEventListener(
+            "click",
+            closeItemModal
+        );
+
+
+        overlay.addEventListener(
+            "click",
+            closeItemModal
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    modal.classList.contains("open")
+                ) {
+
+                    closeItemModal();
+
+                }
+
+            }
+        );
+
+    });
+    </script>
+
 </body>
 </html>

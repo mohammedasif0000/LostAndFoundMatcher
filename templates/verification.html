@@ -282,6 +282,56 @@
             }
 
         }
+        /* =========================================
+        VERIFIED CONTACT
+        ========================================= */
+
+        .verified-contact-card {
+            max-width: 600px;
+            margin: 25px auto 5px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: left;
+            background: #eefaf8;
+            border: 1px solid #b8e5df;
+            border-radius: 16px;
+        }
+
+        .verified-contact-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #d9f5f1;
+            border-radius: 12px;
+            font-size: 22px;
+        }
+
+        .verified-contact-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #07877f;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .verified-contact-card h3 {
+            margin: 0 0 5px;
+            color: var(--ink, #17144d);
+            font-size: 20px;
+        }
+
+        .verified-contact-card p {
+            margin: 0;
+            color: var(--ink-soft, #68658a);
+            font-size: 12px;
+            line-height: 1.5;
+        }
 
     </style>
 
@@ -482,6 +532,31 @@
                     The information you provided strongly matches
                     the reported item.
                 </p>
+
+                <!-- CONTACT REVEALED AFTER VERIFICATION -->
+
+                <div class="verified-contact-card">
+
+                    <div class="verified-contact-icon">
+                        📞
+                    </div>
+
+                    <div>
+                        <span class="verified-contact-label">
+                            VERIFIED CONTACT
+                        </span>
+
+                        <h3>
+                            {{ item['contact'] }}
+                        </h3>
+
+                        <p>
+                            You have successfully verified this item.
+                            You can now contact the reporter to arrange its return.
+                        </p>
+                    </div>
+
+                </div>
 
             {% elif status == "Needs review" %}
 

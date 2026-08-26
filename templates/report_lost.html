@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="report-page">
+<body class="report-page report-lost-page">
 
     <h1>Report Lost</h1>
 
@@ -235,11 +235,33 @@
             <!-- Image -->
             <li>
                 <b>Upload image:</b>
-                <input
-                    type="file"
-                    name="photos"
-                    accept="image/*"
-                    multiple>
+                <div class="report-image-upload">
+
+                    <input
+                        type="file"
+                        id="lostImageInput"
+                        name="photos"
+                        accept="image/*"
+                        class="report-image-input"
+                    >
+
+                    <div
+                        id="lostImagePreview"
+                        class="image-preview-box"
+                    >
+                        <img
+                            id="lostPreviewImg"
+                            src=""
+                            alt="Selected image preview"
+                        >
+
+                        <div
+                            id="lostPreviewName"
+                            class="image-preview-name"
+                        ></div>
+                    </div>
+
+                </div>
 
             </li>
 
@@ -434,6 +456,58 @@
 
         }
     );
+
+    /* =========================================================
+    LOST IMAGE PREVIEW
+    ========================================================= */
+
+    const lostImageInput =
+        document.getElementById("lostImageInput");
+
+    const lostImagePreview =
+        document.getElementById("lostImagePreview");
+
+    const lostPreviewImg =
+        document.getElementById("lostPreviewImg");
+
+    const lostPreviewName =
+        document.getElementById("lostPreviewName");
+
+    lostImageInput.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            lostImagePreview.classList.remove("show");
+            lostPreviewImg.src = "";
+            lostPreviewName.textContent = "";
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+
+            this.value = "";
+            lostImagePreview.classList.remove("show");
+
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            lostPreviewImg.src = event.target.result;
+
+            lostPreviewName.textContent =
+                file.name;
+
+            lostImagePreview.classList.add("show");
+        };
+
+        reader.readAsDataURL(file);
+
+    });
 
 </script>
 

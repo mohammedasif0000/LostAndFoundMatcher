@@ -2,147 +2,505 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ item['item_name'] }} | LOST & FOUND</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        /* =========================================================
+           ITEM DETAILS PAGE — polished layout using existing theme
+        ========================================================= */
+
+        body.item-details-page {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(246, 250, 250, .78), rgba(246, 250, 250, .78)),
+                url("../static/images/backgrounds/watercolor-dashboard.jpg");
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+        }
+
+        .details-main {
+            width: min(1120px, calc(100% - 48px));
+            margin: 0 auto;
+            padding: 42px 0 65px;
+        }
+
+        .details-hero {
+            margin-bottom: 24px;
+        }
+
+        .details-eyebrow {
+            margin: 0 0 7px;
+            color: var(--found);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .details-hero h1 {
+            margin: 0;
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4vw, 40px);
+            line-height: 1.12;
+            color: var(--ink);
+        }
+
+        .details-hero p {
+            margin: 9px 0 0;
+            color: var(--ink-soft);
+            font-size: 13px;
+        }
+
+        .details-card {
+            display: grid;
+            grid-template-columns: minmax(360px, 46%) minmax(0, 54%);
+            overflow: hidden;
+            background: rgba(255,255,255,.96);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .details-image-panel {
+            min-height: 540px;
+            padding: 24px;
+            background: linear-gradient(145deg, #f1eff9, #e8f7f6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-image-wrap {
+            position: relative;
+            flex: 1;
+            min-height: 450px;
+            overflow: hidden;
+            border-radius: 18px;
+            background: rgba(255,255,255,.7);
+            border: 1px solid rgba(227,223,245,.9);
+        }
+
+        .details-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 22px;
+        }
+
+        .details-no-image {
+            height: 100%;
+            min-height: 450px;
+            display: grid;
+            place-items: center;
+            color: var(--ink-soft);
+            font-size: 13px;
+        }
+
+        .details-type-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 2;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .08em;
+        }
+
+        .details-type-badge.lost {
+            background: var(--lost-soft);
+            color: var(--lost);
+        }
+
+        .details-type-badge.found {
+            background: var(--found-soft);
+            color: var(--found);
+        }
+
+        .details-returned {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 2;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #e8f8f0;
+            color: #16834e;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .06em;
+        }
+
+        .details-content {
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-status-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .details-content h2 {
+            margin: 0 0 24px;
+            font-family: var(--font-display);
+            font-size: 28px;
+            line-height: 1.2;
+            color: var(--ink);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+        }
+
+        .details-field {
+            padding: 14px 15px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: #fff;
+        }
+
+        .details-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .details-field-label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--ink-soft);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+
+        .details-field-value {
+            display: block;
+            color: var(--ink);
+            font-size: 12px;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .details-security {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 14px;
+            background: #fff8fb;
+            border: 1px solid #f5d9e5;
+        }
+
+        .details-security-icon {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--lost-soft);
+            font-size: 15px;
+        }
+
+        .details-security strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--ink);
+            font-size: 11px;
+        }
+
+        .details-security p {
+            margin: 0;
+            color: var(--ink-soft);
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .details-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 24px;
+        }
+
+        .details-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 43px;
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .details-actions a:hover {
+            transform: translateY(-2px);
+        }
+
+        .details-primary {
+            background: var(--found);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0,169,165,.18);
+        }
+
+        .details-secondary {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .details-back {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 800px) {
+            .details-main {
+                width: min(100% - 28px, 650px);
+                padding-top: 28px;
+            }
+
+            .details-card {
+                grid-template-columns: 1fr;
+            }
+
+            .details-image-panel {
+                min-height: 360px;
+            }
+
+            .details-image-wrap,
+            .details-no-image {
+                min-height: 320px;
+            }
+
+            .details-content {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .site-header {
+                padding: 12px 16px;
+            }
+
+            .main-nav {
+                gap: 2px;
+            }
+
+            .main-nav a {
+                padding: 6px 7px;
+                font-size: 10px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .details-field.full {
+                grid-column: auto;
+            }
+
+            .details-content h2 {
+                font-size: 23px;
+            }
+
+            .details-actions a {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 
-<body>
+<body class="item-details-page">
 
     <header class="site-header">
 
         <a href="{{ url_for('dashboard') }}" class="brand">
-
-            <span class="brand-mark">
-                L&F
-            </span>
-
-            <span class="brand-name">
-                LOST & FOUND
-            </span>
-
+            <span class="brand-mark">L&F</span>
+            <span class="brand-name">LOST & FOUND</span>
         </a>
 
         <nav class="main-nav">
-
-            <a href="{{ url_for('dashboard') }}">
-                Dashboard
-            </a>
-
-            <a href="{{ url_for('report_lost') }}">
-                Report Lost
-            </a>
-
-            <a href="{{ url_for('report_found') }}">
-                Report Found
-            </a>
-
-            <a href="{{ url_for('logout') }}">
-                Logout
-            </a>
-
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('report_lost') }}">Report Lost</a>
+            <a href="{{ url_for('report_found') }}">Report Found</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
         </nav>
 
     </header>
 
 
-    <main class="dashboard-main">
+    <main class="details-main">
 
-        <section class="welcome-banner">
+        <section class="details-hero">
+            <p class="details-eyebrow">Reported Item</p>
 
-            <p class="dashboard-eyebrow">
-                ITEM DETAILS
-            </p>
-
-            <h1>
-                {{ item['item_name'] }}
-            </h1>
+            <h1>{{ item['item_name'] }}</h1>
 
             <p>
-                Full information about this reported item.
+                Review the available information about this lost or found item.
             </p>
-
         </section>
 
 
-        <section class="dashboard-section">
+        <section class="details-card">
 
-            <div class="recent-item">
+            <!-- ================= IMAGE ================= -->
 
-                <div class="recent-item-info">
+            <div class="details-image-panel">
 
-                    <span class="recent-item-type {{ item['type'] }}">
+                <div class="details-image-wrap">
+
+                    <span class="details-type-badge {{ item['type']|lower }}">
                         {{ item['type']|upper }}
                     </span>
 
                     {% if item['returned'] == 1 %}
-
-                        <span
-                            class="recent-item-type"
-                            style="
-                                background: #e8f8f0;
-                                color: #16834e;
-                                margin-left: 8px;
-                            "
-                        >
+                        <span class="details-returned">
                             RETURNED
                         </span>
-
                     {% endif %}
 
-                    <h3>
-                        {{ item['item_name'] }}
-                    </h3>
-
-                    <p>
-                        <strong>Category:</strong>
-                        {{ item['category']|capitalize }}
-                    </p>
-
-                    <p>
-                        <strong>Location:</strong>
-                        {{ item['location'] }}
-                    </p>
-
-                    <p>
-                        <strong>Date:</strong>
-                        {{ item['date'] }}
-                    </p>
-
-                    <p>
-                        <strong>Description:</strong>
-                        {{ item['description'] }}
-                    </p>
-
-                    <p>
-                        <strong>Contact:</strong>
-                        {{ item['contact'] }}
-                    </p>
-
                     {% if item['image'] %}
-
-                        <p>
-                            <strong>Image:</strong>
-                        </p>
 
                         <img
                             src="{{ url_for('static', filename='uploads/' + item['image']) }}"
                             alt="{{ item['item_name'] }}"
-                            style="max-width: 400px; width: 100%; border-radius: 15px;"
                         >
+
+                    {% else %}
+
+                        <div class="details-no-image">
+                            No image available
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= DETAILS ================= -->
+
+            <div class="details-content">
+
+                <div class="details-status-row">
+                    <span class="details-eyebrow" style="margin:0;">
+                        Item information
+                    </span>
+                </div>
+
+                <h2>{{ item['item_name'] }}</h2>
+
+
+                <div class="details-grid">
+
+                    <div class="details-field">
+                        <span class="details-field-label">Category</span>
+                        <span class="details-field-value">
+                            {{ item['category']|capitalize }}
+                        </span>
+                    </div>
+
+
+                    <div class="details-field">
+                        <span class="details-field-label">Date</span>
+                        <span class="details-field-value">
+                            {{ item['date'] or 'Not specified' }}
+                        </span>
+                    </div>
+
+
+                    <div class="details-field full">
+                        <span class="details-field-label">Location</span>
+                        <span class="details-field-value">
+                            {{ item['location'] or 'Not specified' }}
+                        </span>
+                    </div>
+
+
+                    <div class="details-field full">
+                        <span class="details-field-label">Description</span>
+                        <span class="details-field-value">
+                            {{ item['description'] or 'No description provided.' }}
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- CONTACT PROTECTION -->
+
+                <div class="details-security">
+
+                    <div class="details-security-icon">
+                        🔒
+                    </div>
+
+                    <div>
+                        <strong>Contact information protected</strong>
+
+                        <p>
+                            Verification is required before contact information
+                            can be revealed. This helps keep reported users safe.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="details-actions">
+
+                    {% if item['type'] == 'lost' %}
+
+                        <a
+                            href="{{ url_for('match_result', lost_id=item['id']) }}"
+                            class="details-primary"
+                        >
+                            🔎 Find Possible Matches
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if source == "items" %}
+
+                        <a
+                            href="{{ url_for('items') }}"
+                            class="details-back"
+                        >
+                            ← All Reported Items
+                        </a>
+
+                    {% else %}
+
+                        <a
+                            href="{{ url_for('dashboard') }}"
+                            class="details-back"
+                        >
+                            ← Back to Dashboard
+                        </a>
 
                     {% endif %}
 
@@ -152,52 +510,11 @@
 
         </section>
 
-
-        <section class="dashboard-section">
-
-            {% if item['type'] == 'lost' %}
-
-                <a
-                    href="{{ url_for('match_result', lost_id=item['id']) }}"
-                    class="btn-primary"
-                >
-                    🔎 Find Possible Matches
-                </a>
-
-            {% endif %}
-
-
-            {% if source == "items" %}
-
-                <a
-                    href="{{ url_for('items') }}"
-                    class="btn-primary"
-                >
-                    ← Back to All Reported Items
-                </a>
-
-            {% else %}
-
-                <a
-                    href="{{ url_for('dashboard') }}"
-                    class="btn-primary"
-                >
-                    ← Back to Dashboard
-                </a>
-
-            {% endif %}
-
-        </section>
-
     </main>
 
 
     <footer class="dashboard-footer">
-
-        <p>
-            LOST & FOUND · Find. Report. Reunite.
-        </p>
-
+        <p>LOST & FOUND · Find. Report. Reunite.</p>
     </footer>
 
 </body>

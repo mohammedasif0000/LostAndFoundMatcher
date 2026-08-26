@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             card.dataset.description || "No description provided.";
 
         const contact =
-            card.dataset.contact || "Contact information unavailable.";
+            "🔒 Protected — verification required to contact the reporter.";
 
         const image =
             card.dataset.image || "";
@@ -293,3 +293,75 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 });
+
+
+/* =========================================================
+   REPORT IMAGE PREVIEW
+========================================================= */
+
+function setupReportImagePreview(
+    inputId,
+    previewId,
+    imageId,
+    nameId
+) {
+
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const image = document.getElementById(imageId);
+    const name = document.getElementById(nameId);
+
+    if (!input || !preview || !image || !name) {
+        return;
+    }
+
+    input.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            preview.classList.remove("show");
+            image.src = "";
+            name.textContent = "";
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            preview.classList.remove("show");
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            image.src = event.target.result;
+
+            name.textContent =
+                "Selected: " + file.name;
+
+            preview.classList.add("show");
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+
+/* Lost form */
+setupReportImagePreview(
+    "lostImageInput",
+    "lostImagePreview",
+    "lostPreviewImg",
+    "lostPreviewName"
+);
+
+
+/* Found form */
+setupReportImagePreview(
+    "foundImageInput",
+    "foundImagePreview",
+    "foundPreviewImg",
+    "foundPreviewName"
+);
+

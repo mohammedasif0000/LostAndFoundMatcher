@@ -82,6 +82,7 @@ def report_lost():
             )
 
         item_id = add_item(
+            session["user_id"],
             "lost",
             item_name,
             category,
@@ -143,6 +144,7 @@ def report_found():
             )
 
         item_id = add_item(
+            session["user_id"],
             "found",
             item_name,
             category,
@@ -753,6 +755,9 @@ def items():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        if not name:
+            return "Please enter your full name"
         username = request.form.get("username", "").strip()
         if not re.fullmatch(r"[A-Za-z0-9_]{3,20}", username):
             return "Username must be 3-20 characters and contain only letters, numbers, or _"
@@ -783,7 +788,7 @@ def signup():
         
         password_hash = generate_password_hash(password)
 
-        if not add_user(username, email, password_hash):
+        if not add_user(name, username, email, password_hash):
             return "Username or email already exists"
 
         return redirect(url_for("login"))
@@ -809,6 +814,69 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user = get_user_by_id(session["user_id"])
+
+    if request.method == "POST":
+
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        # Check current password
+        if not check_password_hash(
+            user["password_hash"],
+            current_password
+        ):
+            return "Current password is incorrect"
+
+        # Check new password
+        if new_password != confirm_password:
+            return "New passwords do not match"
+
+        if len(new_password) < 8:
+            return "Password must be at least 8 characters long"
+
+        if not re.search(r"[A-Z]", new_password):
+            return "Password must contain an uppercase letter"
+
+        if not re.search(r"[a-z]", new_password):
+            return "Password must contain a lowercase letter"
+
+        if not re.search(r"\d", new_password):
+            return "Password must contain a number"
+
+        if not re.search(r"[!@#$%^&*]", new_password):
+            return "Password must contain a special character"
+
+        new_password_hash = generate_password_hash(new_password)
+
+        connection = get_db_connection()
+
+        connection.execute(
+            """
+            UPDATE users
+            SET password_hash = ?
+            WHERE id = ?
+            """,
+            (new_password_hash, session["user_id"])
+        )
+
+        connection.commit()
+        connection.close()
+
+        return redirect(url_for("dashboard"))
+
+    return render_template(
+        "change_password.html",
+        user=user
+    )
 
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
@@ -862,39 +930,96 @@ def item_details(item_id):
 
 @app.route("/dashboard")
 def dashboard():
+
     user_id = session.get("user_id")
+    print("DASHBOARD USER ID:", user_id)
 
     if user_id is None:
         return redirect(url_for("login"))
 
     user = get_user_by_id(user_id)
-    items = get_items()
 
-    total_items = len(items)
+    connection = get_db_connection()
 
-    found_items = sum(
-        1 for item in items
-        if item["type"] == "found"
-    )
+    # =========================================================
+    # COMMUNITY / GLOBAL STATISTICS
+    # =========================================================
 
-    lost_items = sum(
-        1 for item in items
+    total_items = connection.execute(
+        "SELECT COUNT(*) FROM items"
+    ).fetchone()[0]
+
+    lost_items = connection.execute(
+        "SELECT COUNT(*) FROM items WHERE type = 'lost'"
+    ).fetchone()[0]
+
+    found_items = connection.execute(
+        "SELECT COUNT(*) FROM items WHERE type = 'found'"
+    ).fetchone()[0]
+
+    returned_items = connection.execute(
+        "SELECT COUNT(*) FROM items WHERE returned = 1"
+    ).fetchone()[0]
+
+
+    # =========================================================
+    # MY REPORTS
+    # Only reports belonging to the logged-in user
+    # =========================================================
+
+    my_items = connection.execute(
+        """
+        SELECT *
+        FROM items
+        WHERE user_id = ?
+        ORDER BY id DESC
+        """,
+        (user_id,)
+    ).fetchall()
+
+
+    # =========================================================
+    # MY STATISTICS
+    # =========================================================
+
+    my_total_items = len(my_items)
+
+    my_lost_items = sum(
+        1 for item in my_items
         if item["type"] == "lost"
     )
 
-    returned_items = sum(
-        1 for item in items
+    my_found_items = sum(
+        1 for item in my_items
+        if item["type"] == "found"
+    )
+
+    my_returned_items = sum(
+        1 for item in my_items
         if item["returned"] == 1
     )
 
+
+    connection.close()
+
+
     return render_template(
         "dashboard.html",
+
         user=user,
-        items=items,
+
+        # Community statistics
         total_items=total_items,
-        found_items=found_items,
         lost_items=lost_items,
-        returned_items=returned_items
+        found_items=found_items,
+        returned_items=returned_items,
+
+        # User-specific data
+        my_items=my_items,
+        my_total_items=my_total_items,
+        my_lost_items=my_lost_items,
+        my_found_items=my_found_items,
+        my_returned_items=my_returned_items
     )
 
 if __name__ == "__main__":

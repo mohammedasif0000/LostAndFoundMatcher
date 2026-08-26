@@ -20,6 +20,7 @@
         <nav class="home-auth-nav" aria-label="Account navigation">
             <a href="{{ url_for('login') }}" class="home-login">Login</a>
             <a href="{{ url_for('signup') }}" class="home-signup">Sign Up</a>
+            <a href="{{ url_for('dashboard') }}" class="dashboard-link">Dashboard</a>
         </nav>
 
         <div class="home-hero">
@@ -93,6 +94,29 @@
                 <div class="stat-card"><span class="stat-number">{{ success_rate }}</span><h3>Success Rate</h3></div>
             </div>
         </section>
+
+        <section id="about">
+            <h2>About LOST & FOUND</h2>
+            <p>
+                A simple platform to report lost and found items,
+                discover possible matches, and reunite items with their owners.
+            </p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>
+                Need help? Contact the LOST & FOUND project team.
+            </p>
+        </section>
+
+        <section id="team">
+            <h2>Our Team</h2>
+            <p>
+                LOST & FOUND — Expo Project
+            </p>
+        </section>
+
     </main>
 
     <footer class="site-footer">
@@ -102,9 +126,9 @@
                 <p>Find. Report. Reunite.</p>
             </div>
             <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-                <a href="#">Team</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <a href="#team">Team</a>
             </div>
         </div>
         <div class="footer-bottom">

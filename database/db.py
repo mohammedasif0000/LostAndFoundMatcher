@@ -40,27 +40,62 @@ def create_users_table():
     connection.commit()
     connection.close()
 
-def add_user(username, email, password_hash):
+def update_users_table():
     connection = get_db_connection()
+
+    try:
+        connection.execute(
+            "ALTER TABLE users ADD COLUMN name TEXT"
+        )
+        connection.commit()
+        print("Users table updated: name column added")
+
+    except sqlite3.OperationalError as error:
+        print("Users table update:", error)
+
+    finally:
+        connection.close()
+
+def add_user(name, username, email, password_hash):
+    connection = get_db_connection()
+
     try:
         connection.execute(
             """
-            INSERT INTO users (username, email, password_hash)
-            VALUES (?, ?, ?)
+            INSERT INTO users
+            (name, username, email, password_hash)
+            VALUES (?, ?, ?, ?)
             """,
-            (username, email, password_hash)
+            (name, username, email, password_hash)
         )
+
         connection.commit()
+
     except sqlite3.IntegrityError:
         connection.close()
         return False
+
     connection.close()
     return True
 
-def add_item(item_type,item_name,category,description,location,date,image,contact,identifying_feature,secret_detail):
+def add_item(
+    user_id,
+    item_type,
+    item_name,
+    category,
+    description,
+    location,
+    date,
+    image,
+    contact,
+    identifying_feature,
+    secret_detail
+):
     connection = get_db_connection()
+
     connection.execute("""
         INSERT INTO items (
+            user_id,
             type,
             item_name,
             category,
@@ -72,8 +107,9 @@ def add_item(item_type,item_name,category,description,location,date,image,contac
             identifying_feature,
             secret_detail
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
+        user_id,
         item_type,
         item_name,
         category,
@@ -85,9 +121,15 @@ def add_item(item_type,item_name,category,description,location,date,image,contac
         identifying_feature,
         secret_detail
     ))
+
     connection.commit()
-    item_id = connection.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+    item_id = connection.execute(
+        "SELECT last_insert_rowid()"
+    ).fetchone()[0]
+
     connection.close()
+
     return item_id
 
 def get_items():
@@ -146,19 +188,37 @@ def update_password(email, password_hash):
 
 def update_items_table():
     connection = get_db_connection()
-    try:
+
+    columns = connection.execute(
+        "PRAGMA table_info(items)"
+    ).fetchall()
+
+    column_names = [column["name"] for column in columns]
+
+    if "identifying_feature" not in column_names:
         connection.execute(
-            "ALTER TABLE Items ADD COLUMN identifying_feature TEXT"
+            "ALTER TABLE items ADD COLUMN identifying_feature TEXT"
         )
+
+    if "secret_detail" not in column_names:
         connection.execute(
-            "ALTER TABLE Items ADD COLUMN secret_detail TEXT"
+            "ALTER TABLE items ADD COLUMN secret_detail TEXT"
         )
-        connection.commit()
-        print("Items table updated")
-    except sqlite3.OperationalError as error:
-        print("Update:", error)
-    finally:
-        connection.close()
+
+    if "returned" not in column_names:
+        connection.execute(
+            "ALTER TABLE items ADD COLUMN returned INTEGER DEFAULT 0"
+        )
+
+    if "user_id" not in column_names:
+        connection.execute(
+            "ALTER TABLE items ADD COLUMN user_id INTEGER"
+        )
+
+    connection.commit()
+    connection.close()
+
+    print("Items table updated")
 
 def create_verification_table():
     connection = get_db_connection()
@@ -186,6 +246,7 @@ def create_verification_table():
 if __name__=="__main__":
     create_table()
     create_users_table()
+    update_users_table()
     update_items_table()
     create_verification_table()
     print("Database ready")

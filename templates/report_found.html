@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="report-page">
+<body class="report-page report-found-page">
 
     <h1>Report Found</h1>
 
@@ -218,12 +218,33 @@
             <!-- Image -->
             <li>
                 <b>Upload image:</b>
-                <input
-                    type="file"
-                    name="photos"
-                    accept="image/*"
-                    multiple
-                    required>
+                <div class="report-image-upload">
+
+                    <input
+                        type="file"
+                        id="foundImageInput"
+                        name="photos"
+                        accept="image/*"
+                        class="report-image-input"
+                    >
+
+                    <div
+                        id="foundImagePreview"
+                        class="image-preview-box"
+                    >
+                        <img
+                            id="foundPreviewImg"
+                            src=""
+                            alt="Selected image preview"
+                        >
+
+                        <div
+                            id="foundPreviewName"
+                            class="image-preview-name"
+                        ></div>
+                    </div>
+
+                </div>
 
                 <ul>
                     <li>Mandatory</li>
@@ -421,6 +442,58 @@
 
         }
     );
+
+    /* =========================================================
+    FOUND IMAGE PREVIEW
+    ========================================================= */
+
+    const foundImageInput =
+        document.getElementById("foundImageInput");
+
+    const foundImagePreview =
+        document.getElementById("foundImagePreview");
+
+    const foundPreviewImg =
+        document.getElementById("foundPreviewImg");
+
+    const foundPreviewName =
+        document.getElementById("foundPreviewName");
+
+    foundImageInput.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            foundImagePreview.classList.remove("show");
+            foundPreviewImg.src = "";
+            foundPreviewName.textContent = "";
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+
+            this.value = "";
+            foundImagePreview.classList.remove("show");
+
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            foundPreviewImg.src = event.target.result;
+
+            foundPreviewName.textContent =
+                file.name;
+
+            foundImagePreview.classList.add("show");
+        };
+
+        reader.readAsDataURL(file);
+
+    });
 
 </script>
 
